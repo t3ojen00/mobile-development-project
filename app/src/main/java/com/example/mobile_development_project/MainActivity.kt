@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.example.mobile_development_project.navigation.Navigation
+import com.example.mobile_development_project.ui.components.TopBar
 import com.example.mobile_development_project.ui.theme.MobiledevelopmentprojectTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,30 +23,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             MobiledevelopmentprojectTheme {
                 val navController = rememberNavController()
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Navigation(navController = navController)
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Scaffold(
+                    topBar = { TopBar(navController = navController) },
+                    modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    Navigation(
+                        navController = navController,
+                        modifier = Modifier.padding(innerPadding))
+
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MobiledevelopmentprojectTheme {
-        Greeting("Android")
     }
 }
