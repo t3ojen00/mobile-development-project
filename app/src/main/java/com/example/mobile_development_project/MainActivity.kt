@@ -11,6 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.example.mobile_development_project.navigation.Navigation
+import com.example.mobile_development_project.ui.components.TopBar
 import com.example.mobile_development_project.ui.theme.MobiledevelopmentprojectTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,29 +22,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MobiledevelopmentprojectTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val navController = rememberNavController()
+                Scaffold(
+                    topBar = { TopBar(navController = navController) },
+                    modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    Navigation(
+                        navController = navController,
+                        modifier = Modifier.padding(innerPadding))
+
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MobiledevelopmentprojectTheme {
-        Greeting("Android")
     }
 }
