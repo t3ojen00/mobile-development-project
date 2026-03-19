@@ -11,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.example.mobile_development_project.navigation.Navigation
 import com.example.mobile_development_project.ui.theme.MobiledevelopmentprojectTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,7 +21,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MobiledevelopmentprojectTheme {
+                val navController = rememberNavController()
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    Navigation(navController = navController)
                     Greeting(
                         name = "Android",
                         modifier = Modifier.padding(innerPadding)
