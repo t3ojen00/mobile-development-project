@@ -1,6 +1,8 @@
 package com.example.mobile_development_project.navigation
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,11 +19,15 @@ import com.example.mobile_development_project.ui.screens.SearchLocationScreen
 
 
 @Composable
-fun Navigation(navController: NavHostController) {
+fun Navigation(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     // define navhost container and start destination
     NavHost(
         navController,
-        startDestination = NavRoutes.Map
+        startDestination = NavRoutes.Map,
+        modifier = modifier.fillMaxSize()
     )
     {
         // all routes go here
