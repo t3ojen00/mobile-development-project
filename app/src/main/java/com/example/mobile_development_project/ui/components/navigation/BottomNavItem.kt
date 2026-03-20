@@ -1,10 +1,6 @@
 package com.example.mobile_development_project.ui.components.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.mobile_development_project.R
 import com.example.mobile_development_project.navigation.NavRoutes
 
 // centralizing all navigation items definition for the BottomBar navigation
@@ -12,24 +8,34 @@ import com.example.mobile_development_project.navigation.NavRoutes
 data class BottomNavItem(
     val route: String,
     val label: String, // label optional
-    val icon: ImageVector
+    val icon: Int
 )
 
-// current items, will be updated
+// define all bottom navigation items
 val bottomItems = listOf(
     BottomNavItem(
         route = NavRoutes.Map,
         label = "Map",
-        icon = Icons.Default.Home
+        icon = R.drawable.map_icon
     ),
     BottomNavItem(
         route = NavRoutes.Favorites,
         label = "Favorites",
-        icon = Icons.Default.Favorite
+        icon = R.drawable.favorites_icon
+    ),
+    BottomNavItem(
+        route = NavRoutes.AddLocation,
+        label = "Add location",
+        icon = R.drawable.add_icon
     ),
     BottomNavItem(
         route = NavRoutes.Search,
         label = "Search",
-        icon = Icons.Default.Search
-    )
+        icon = R.drawable.search_icon
+    ),
+    BottomNavItem(
+        route = NavRoutes.UserProfile,
+        label = "Profile",
+        icon = R.drawable.user_icon
+    ),
 )
