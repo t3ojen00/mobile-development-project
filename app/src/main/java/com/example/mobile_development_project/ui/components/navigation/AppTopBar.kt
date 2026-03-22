@@ -73,7 +73,6 @@ fun TopBar(navController: NavHostController) {
                     )
                 }
                 Text(text = currentTitle)
-
             }
         }
     )
