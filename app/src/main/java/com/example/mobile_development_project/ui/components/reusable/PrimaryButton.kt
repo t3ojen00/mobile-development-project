@@ -1,5 +1,6 @@
 package com.example.mobile_development_project.ui.components.reusable
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -10,7 +11,7 @@ import androidx.compose.ui.Modifier
 
 @Composable
 
-fun ButtonComponent(
+fun PrimaryButton(
     label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -23,7 +24,7 @@ fun ButtonComponent(
 {
     Button(
         onClick = onClick,
-        modifier = modifier, // initially just small btn, but make bigger with fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
         colors = colors,
         enabled = enabled,
     ) {
