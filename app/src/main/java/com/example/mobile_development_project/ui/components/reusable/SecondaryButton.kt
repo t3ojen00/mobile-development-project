@@ -23,7 +23,7 @@ fun SecondaryButton(
 {
     Button(
         onClick = onClick,
-        modifier = modifier, // initially just small btn, but make bigger with fillMaxWidth()
+        modifier = modifier, // initially just small btn, but make bigger with modifier or use the PrimaryButton
         colors = colors,
         enabled = enabled,
     ) {
