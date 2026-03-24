@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "748424237911",
+    "project_id": "location-scout-app-1c3d3",
+    "storage_bucket": "location-scout-app-1c3d3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:748424237911:android:364dc2f55a0d620ea9a412",
+        "android_client_info": {
+          "package_name": "com.example.mobile_development_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8c9r7wSCKvN4sZrSfQrIZ02FGP0TRwaY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
