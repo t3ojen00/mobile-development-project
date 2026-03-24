@@ -24,7 +24,7 @@ fun PrimaryButton(
 {
     Button(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(), // full width button
         colors = colors,
         enabled = enabled,
     ) {
