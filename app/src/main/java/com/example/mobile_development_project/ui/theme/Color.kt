@@ -14,3 +14,4 @@ val Pink40 = Color(0xFF7D5260)
 
 val navbar = Color(0xFF020202)
 val navIcon = Color(0xFFF8F8F8)
+val cardColor = Color(0xFFC7C7C7)
