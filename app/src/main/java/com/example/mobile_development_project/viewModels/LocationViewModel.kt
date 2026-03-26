@@ -21,6 +21,10 @@ class LocationViewModel : ViewModel() {
     var gpsCoordinates by mutableStateOf<Pair<Double, Double>?>(null) // long & lat
         private set
 
+    // ui messages
+    var uiMessage by mutableStateOf<String?>(null)
+        private set
+
     // setters for variables above
     fun onLocationNameChange(value: String) {
         locationName = value
@@ -30,6 +34,12 @@ class LocationViewModel : ViewModel() {
     }
     // saves location to firebase
     fun saveLocation() {
+        // validate fields not being empty
+        if (locationName.isBlank() || description.isBlank()) {
+            uiMessage = "Fields can't be empty"
+            return
+        }
+
         val location = hashMapOf(
             "name" to locationName,
             "description" to description,
@@ -41,11 +51,17 @@ class LocationViewModel : ViewModel() {
         db.collection("locations")
             .add(location)
             .addOnSuccessListener {
+                uiMessage = "Location saved successfully"
                 println("Saved successfully")
             }
             .addOnFailureListener {
+                uiMessage = "Error saving location"
                 println("Error: ${it.message}")
             }
+        // clear message
+        fun clearMessage() {
+            uiMessage = null
+        }
     }
 
     // logic for tags
