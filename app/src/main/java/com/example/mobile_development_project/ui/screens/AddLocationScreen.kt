@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.mobile_development_project.ui.components.reusable.CardFormComponent
 import com.example.mobile_development_project.ui.components.reusable.PrimaryButton
@@ -25,6 +27,15 @@ fun AddLocationScreen(
     ) {
         CardFormComponent(viewModel = viewModel)
         Spacer(modifier = Modifier.height(16.dp))
+
+        // display error/success messages
+        viewModel.uiMessage?.let { message ->
+            Text(
+                text = message,
+                color = Color.Red, //
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
 
         // save button
         PrimaryButton(
