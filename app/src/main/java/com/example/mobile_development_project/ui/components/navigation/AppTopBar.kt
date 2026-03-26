@@ -1,11 +1,11 @@
 package com.example.mobile_development_project.ui.components.navigation
 
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +23,10 @@ fun TopBar(navController: NavHostController) {
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
+    // back-navigation on other routes except map
+    val showBackArrow = currentRoute != NavRoutes.Map
+    // location marker icon only on map screen
+    val showMarkerIcon = currentRoute == NavRoutes.Map
 
     // define title based on route
     val currentTitle = when {
@@ -43,23 +47,32 @@ fun TopBar(navController: NavHostController) {
     // set the title on topbar dynamically based on the current screen
     CenterAlignedTopAppBar(
         modifier = Modifier.fillMaxWidth(),
+        navigationIcon = {
+            if (showBackArrow) {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Navigate back"
+                    )
+                }
+            }
+        },
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = 10.dp)
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .padding(end = if (showMarkerIcon) 14.dp else 0.dp) // centralize icon+title on map screen
             ) {
-                // location marker icon only on map screen
-                if (currentRoute == NavRoutes.Map) {
+                if (showMarkerIcon) {
                     Icon(
                         painter = painterResource(id = R.drawable.location_marker),
-                        contentDescription = null,
+                        contentDescription = "Location marker",
                         modifier = Modifier.size(50.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
-
                 }
                 Text(text = currentTitle)
-                Spacer(modifier = Modifier.width(12.dp))
             }
         }
     )
