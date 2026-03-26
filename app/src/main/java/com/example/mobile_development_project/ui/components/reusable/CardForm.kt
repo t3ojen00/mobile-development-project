@@ -35,7 +35,8 @@ fun CardFormComponent(
 
     Card(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxWidth()
+            .wrapContentHeight(),
         colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
         Column(modifier = Modifier
