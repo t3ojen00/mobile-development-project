@@ -1,14 +1,17 @@
 package com.example.mobile_development_project.data.models
 
 data class Location(
-    val name: String,
-    val description: String,
-    val tags: List<String>,
-    //val images: List<String>,
-    val gpsCoordinates: Pair<Latitude, Longitude>,
-    val ownerId: String
+    val id: String = "",
+    val ownerId: String = "",
+    val ownerUsername: String = "",
+    val name: String = "",
+    val description: String = "",
+    val tags: List<String> = emptyList(),
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
+    val previewImageUrl: String = "",
+    val status: String = "pending",
+    val createdAt: Long? = null,
+    val updatedAt: Long? = null,
+    val favoritesCount: Int = 0
 )
-
-val locations = listOf<Location>
-val latitude: Double
-val longitude : Double
