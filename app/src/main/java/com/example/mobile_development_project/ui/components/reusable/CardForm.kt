@@ -1,5 +1,6 @@
 package com.example.mobile_development_project.ui.components.reusable
 
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -35,7 +36,9 @@ fun CardFormComponent(
 
     Card(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(8.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
         Column(modifier = Modifier
@@ -76,7 +79,7 @@ fun CardFormComponent(
             if (showTagInput) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
-                    modifier = Modifier.fillMaxWidth().align(Alignment.CenterHorizontally)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     TextFieldComponent(
                         value = tagInput,
@@ -121,6 +124,35 @@ fun CardFormComponent(
                     }
                     Spacer(modifier = Modifier.height(12.dp)) // vertical space between tags
                 }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row( modifier = Modifier.fillMaxWidth()) {
+                PrimaryButton(
+                    label = "Select location",
+                    onClick = { },
+                    modifier = Modifier.weight(1f)
+                    )
+                Spacer(modifier = Modifier.width(16.dp))
+                PrimaryButton(
+                    label = "Add images",
+                    onClick = { },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                ImagePlaceholder(
+                    modifier = Modifier.weight(1f)
+                )
+
+                ImagePlaceholder(
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
     }

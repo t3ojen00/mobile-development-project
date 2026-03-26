@@ -18,3 +18,4 @@ local.properties
 *.tmp
 *.bak
 *.swp
+ app/google-services.json
