@@ -1,4 +1,5 @@
 plugins {
+    id("com.google.gms.google-services") version "4.4.0"
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
@@ -42,7 +43,10 @@ android {
 }
 
 dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:32.2.0"))
+    implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("androidx.navigation:navigation-compose:2.9.7")
+    implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -53,6 +57,9 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation("org.osmdroid:osmdroid-android:6.1.20")
     implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.ui)
+    //implementation(libs.firebase.firestore.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
