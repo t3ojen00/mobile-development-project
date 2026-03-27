@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import com.example.mobile_development_project.ui.theme.cardColor
 import com.example.mobile_development_project.viewModels.LocationViewModel
 import androidx.compose.foundation.layout.Row
-import androidx.compose.ui.Alignment
 
 @Composable
 fun CardFormComponent(
@@ -37,13 +36,12 @@ fun CardFormComponent(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(8.dp),
+            .wrapContentHeight(),
         colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
         Column(modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
+                .padding(vertical = 24.dp, horizontal = 24.dp)
         ) {
             TextFieldComponent(
                 value = viewModel.locationName,
@@ -88,7 +86,9 @@ fun CardFormComponent(
                         maxCharacters = 20,
                         maxLines = 1,
                         focusManager = focusManager,
-                        modifier = Modifier.weight(1f) // reserves 1/2 of space
+                        modifier = Modifier
+                            .weight(1f) // reserves 1/2 of space
+                            .padding(end = 8.dp),
                     )
 
                     Spacer(modifier = Modifier.width(12.dp))
@@ -133,14 +133,16 @@ fun CardFormComponent(
                     onClick = { },
                     modifier = Modifier.weight(1f)
                     )
+
                 Spacer(modifier = Modifier.width(16.dp))
+
                 PrimaryButton(
                     label = "Add images",
                     onClick = { },
                     modifier = Modifier.weight(1f)
                 )
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(26.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
