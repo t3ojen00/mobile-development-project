@@ -11,7 +11,7 @@ data class Location(
     val longitude: Double = 0.0,
     val previewImageUrl: String = "",
     val status: String = "pending",
-    val createdAt: Long? = null,
-    val updatedAt: Long? = null,
+    val createdAt: String? = null, // date and time
+    val updatedAt: String? = null,
     val favoritesCount: Int = 0
 )
