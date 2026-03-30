@@ -45,7 +45,7 @@ fun AddLocationScreen(
     Column(
         modifier
         .fillMaxSize()
-        .padding(16.dp)
+        .padding(horizontal = 16.dp, vertical = 10.dp)
         .verticalScroll(scrollState)
         // close keyboard when clicked outside
         .clickable(
