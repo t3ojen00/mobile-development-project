@@ -6,69 +6,92 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.mobile_development_project.feature_map.MapScreen
+import com.example.mobile_development_project.ui.screens.AddLocationScreen
+import com.example.mobile_development_project.ui.screens.AdminScreen
+import com.example.mobile_development_project.ui.screens.EditLocationScreen
+import com.example.mobile_development_project.ui.screens.FavoritesScreen
+import com.example.mobile_development_project.ui.screens.LocationDetailScreen
 import com.example.mobile_development_project.ui.screens.LoginScreen
 import com.example.mobile_development_project.ui.screens.RegisterScreen
-import com.example.mobile_development_project.ui.screens.MapScreen
-import com.example.mobile_development_project.ui.screens.AddLocationScreen
-import com.example.mobile_development_project.ui.screens.EditLocationScreen
-import com.example.mobile_development_project.ui.screens.LocationDetailScreen
-import com.example.mobile_development_project.ui.screens.UserProfileScreen
-import com.example.mobile_development_project.ui.screens.FavoritesScreen
-import com.example.mobile_development_project.ui.screens.AdminScreen
 import com.example.mobile_development_project.ui.screens.SearchLocationScreen
-
+import com.example.mobile_development_project.ui.screens.UserProfileScreen
 
 @Composable
 fun Navigation(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    // define navhost container and start destination
     NavHost(
-        navController,
-        startDestination = NavRoutes.Map,
+        navController = navController,
+        startDestination = NavRoutes.Login,
         modifier = modifier.fillMaxSize()
-    )
-    {
-        // all routes go here
+    ) {
+        composable(NavRoutes.Login) {
+            LoginScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onNavigateToRegister = {
+                    navController.navigate(NavRoutes.Register)
+                },
+                onLoginSuccess = {
+                    navController.navigate(NavRoutes.Map) {
+                        popUpTo(NavRoutes.Login) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
 
-        // Authentication
-        composable(NavRoutes.Login) { LoginScreen() }
-        composable(NavRoutes.Register) { RegisterScreen() }
+        composable(NavRoutes.Register) {
+            RegisterScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onRegisterSuccess = {
+                    navController.popBackStack()
+                }
+            )
+        }
 
-        // Map
-        composable(NavRoutes.Map) { MapScreen() }
+        composable(NavRoutes.Map) {
+            MapScreen()
+        }
 
-        // Location details
-        // id-parameter passed in the route (e.g. "location/123") is retrieved with backStackEntry
-        // backStackEntry represents the current screen in the navigation back stack
-        // and holds all necessary info related to the screen (arguments, route, saved state)
         composable(NavRoutes.LocationDetail) { backStackEntry ->
             val locationId = backStackEntry.arguments?.getString("id")
             LocationDetailScreen(locationId)
         }
 
-        // Location management
-        composable(NavRoutes.AddLocation) { AddLocationScreen() }
+        composable(NavRoutes.AddLocation) {
+            AddLocationScreen()
+        }
+
         composable(NavRoutes.EditLocation) { backStackEntry ->
             val locationId = backStackEntry.arguments?.getString("id")
             EditLocationScreen(locationId)
         }
 
-        // User profile
-        composable(NavRoutes.UserProfile) { backStackEntry ->
+        composable(NavRoutes.UserProfile) {
+            UserProfileScreen("current-user")
+        }
+
+        composable(NavRoutes.UserProfileWithId) { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("id")
             UserProfileScreen(userId)
         }
 
-        // Favorites
-        composable(NavRoutes.Favorites) { FavoritesScreen() }
+        composable(NavRoutes.Favorites) {
+            FavoritesScreen()
+        }
 
-        // Admin / moderation
-        composable(NavRoutes.Admin) { AdminScreen() }
+        composable(NavRoutes.Admin) {
+            AdminScreen()
+        }
 
-        // Search / filter
-        composable(NavRoutes.Search) { SearchLocationScreen() }
+        composable(NavRoutes.Search) {
+            SearchLocationScreen()
+        }
     }
 }
-
