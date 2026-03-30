@@ -1,10 +1,8 @@
 package com.example.mobile_development_project.ui.components.reusable
 
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import com.example.mobile_development_project.ui.theme.cardColor
 import com.example.mobile_development_project.viewModels.LocationViewModel
 import androidx.compose.foundation.layout.Row
+import androidx.compose.runtime.mutableStateListOf
+import com.example.mobile_development_project.data.models.Image
 
 @Composable
 fun CardFormComponent(
@@ -33,6 +33,15 @@ fun CardFormComponent(
     var showTagInput by remember { mutableStateOf(false) }
     var tagInput by remember { mutableStateOf("") }
 
+    // list of images (uses Image model)
+    val initialImages = listOf(
+        Image(uri = null),
+        Image(uri = null),
+        Image(uri = null)
+    )
+    // mutable state list of images that updates when user adds own images
+    val images = remember { mutableStateListOf<Image>().apply { addAll(initialImages) } }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -41,7 +50,7 @@ fun CardFormComponent(
     ) {
         Column(modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 24.dp, horizontal = 24.dp)
+                .padding(vertical = 24.dp, horizontal = 18.dp)
         ) {
             TextFieldComponent(
                 value = viewModel.locationName,
@@ -65,7 +74,7 @@ fun CardFormComponent(
                     .fillMaxWidth()
                     .wrapContentHeight(),
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             if (!showTagInput) {
                 PrimaryButton(
@@ -107,7 +116,7 @@ fun CardFormComponent(
 
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // tags displayed in row that wraps them
             val tagsPerRow = 2
@@ -125,7 +134,7 @@ fun CardFormComponent(
                     Spacer(modifier = Modifier.height(12.dp)) // vertical space between tags
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Row( modifier = Modifier.fillMaxWidth()) {
                 PrimaryButton(
@@ -142,20 +151,19 @@ fun CardFormComponent(
                     modifier = Modifier.weight(1f)
                 )
             }
-            Spacer(modifier = Modifier.height(26.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ImageCarousel(items = images)
+
+            // other implementation with smaller images and dots indicating carousel pages
+            /*PagerCarousel(
+                items = listOf("image1", "image2", "image3") // mock
             ) {
                 ImagePlaceholder(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .fillMaxWidth()
                 )
-
-                ImagePlaceholder(
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            }*/
         }
     }
 }
