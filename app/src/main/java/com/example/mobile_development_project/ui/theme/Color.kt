@@ -17,3 +17,15 @@ val navIcon = Color(0xFFF8F8F8)
 val cardColor = Color(0xFFC7C7C7)
 val errorMsg = Color(0xFFAF001D)
 val successMsg = Color(0xFF005D27)
+
+val Burgundy = Color(0xFF731022)
+
+val OrangeAccent = Color(0xFFF27F1B)
+
+val Sage = Color(0xFFB6CCBC)
+
+val AuthCardGray = Color(0xFF6B6B6B)
+
+val ScreenBackground = Color(0xFFF5F5F5)
+
+val FieldBackground = Color(0xFFFFFFFF)
