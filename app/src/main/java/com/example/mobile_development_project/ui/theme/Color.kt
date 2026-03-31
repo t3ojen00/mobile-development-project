@@ -15,3 +15,15 @@ val Pink40 = Color(0xFF7D5260)
 val navbar = Color(0xFF020202)
 val navIcon = Color(0xFFF8F8F8)
 val cardColor = Color(0xFFC7C7C7)
+
+val Burgundy = Color(0xFF731022)
+
+val OrangeAccent = Color(0xFFF27F1B)
+
+val Sage = Color(0xFFB6CCBC)
+
+val AuthCardGray = Color(0xFF6B6B6B)
+
+val ScreenBackground = Color(0xFFF5F5F5)
+
+val FieldBackground = Color(0xFFFFFFFF)
