@@ -15,6 +15,8 @@ val Pink40 = Color(0xFF7D5260)
 val navbar = Color(0xFF020202)
 val navIcon = Color(0xFFF8F8F8)
 val cardColor = Color(0xFFC7C7C7)
+val errorMsg = Color(0xFFAF001D)
+val successMsg = Color(0xFF005D27)
 
 val Burgundy = Color(0xFF731022)
 

@@ -26,6 +26,11 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
+    primary = Purple40,
+    secondary = PurpleGrey40,
+    tertiary = Pink40,
+    background = Color(0xFFFFFBFE),
+    surface = Color(0xFFFFFBFE),
     primary = Burgundy,
     secondary = OrangeAccent,
     tertiary = Sage,
@@ -35,11 +40,14 @@ private val LightColorScheme = lightColorScheme(
     onSecondary = Color.White,
     onTertiary = Color.Black,
     onBackground = Color(0xFF1C1B1F),
+    onSurface = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F)
 )
 
 @Composable
 fun MobiledevelopmentprojectTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    // Dynamic color is available on Android 12+
     darkTheme: Boolean = false,
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
