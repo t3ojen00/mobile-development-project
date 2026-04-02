@@ -4,9 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
+import com.example.mobile_development_project.data.models.ErrorCause
 import com.example.mobile_development_project.data.models.MsgType
 import com.example.mobile_development_project.data.models.Location
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -27,7 +31,7 @@ class LocationViewModel : ViewModel() {
         private set
 
     // ui messages
-    var uiMessage by mutableStateOf<Pair<String, MsgType>?>(null)
+    var uiMessage by mutableStateOf<Triple<String, MsgType, ErrorCause?>?>(null)
         private set
 
     // setters for variables above
@@ -37,46 +41,91 @@ class LocationViewModel : ViewModel() {
     fun onDescriptionChange(value: String) {
         description = value
     }
+    fun setGpsCoordinates(lat: Double, lng: Double) {
+        gpsCoordinates = Pair(lat, lng)
+        uiMessage = Triple(
+            "GPS coordinates set:\n${gpsCoordinates?.first}, ${gpsCoordinates?.second}",
+            MsgType.SUCCESS,
+            null
+        )
+    }
+    fun setError(cause: ErrorCause? = null) {
+        uiMessage = Triple(
+            when (cause) {
+                    ErrorCause.LOCATION_UNAVAILABLE -> "Location not available, try again outdoors or enable GPS"
+                    ErrorCause.LOCATION_FETCH_FAILED -> "Failed to get location, try again"
+                    ErrorCause.LOCATION_PERMISSION_DENIED -> "Location permission denied, please allow in settings"
+                    ErrorCause.COORDINATES_MISSING -> "Coordinates missing"
+                    ErrorCause.BLANK_FIELDS -> "Fields can't be empty"
+                    ErrorCause.USER_ERROR -> "Error finding user"
+                   else -> "Unknown error"
+                },
+            MsgType.ERROR,
+            cause
+        )
+    }
+
     // method to save location to firebase
-    fun saveLocation(): Boolean {
+    fun saveLocation(onSuccess: () -> Unit) {
         // validate fields not being empty
         if (locationName.isBlank() || description.isBlank()) {
-            uiMessage = "Fields can't be empty" to MsgType.ERROR
-            return false
+            setError(ErrorCause.BLANK_FIELDS)
+            return
+        }
+        // validate gps coordinates are set
+        if (gpsCoordinates == null) {
+            setError(ErrorCause.COORDINATES_MISSING)
+            return
         }
 
-        val formatter = SimpleDateFormat(
-            "dd.MM.yyyy HH:mm", Locale("fi", "FI")
-        )
-        val createdAtStr = formatter.format(java.util.Date())
-        val updatedAtStr = formatter.format(java.util.Date())
-
-
-        val location = Location(
-            id = "", // Firebase generates
-            ownerId = "currentUserId",
-            ownerUsername = "currentUsername",
-            name = locationName,
-            description = description,
-            tags = tags,
-            latitude = gpsCoordinates?.first ?: 0.0,
-            longitude = gpsCoordinates?.second ?: 0.0,
-            createdAt = createdAtStr,
-            updatedAt = null
-        )
-
-        db.collection("locations")
-            .add(location)
-            .addOnSuccessListener {
-                //uiMessage = "Location saved successfully" to MsgType.SUCCESS -
-                // > this will be used on edit location method, if we use overlay instead with first time add
-                println("Saved successfully")
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            if (currentUser == null) {
+                setError(ErrorCause.USER_ERROR)
+                return
             }
-            .addOnFailureListener {
-                uiMessage = "Error saving location" to MsgType.ERROR
-                println("Error: ${it.message}")
-            }
-        return true
+
+            val userId = currentUser.uid
+            val username = currentUser.displayName ?: currentUser.email ?: "Unknown"
+
+            val formatter = SimpleDateFormat(
+                "dd.MM.yyyy HH:mm", Locale("fi", "FI")
+            )
+            val createdAtStr = formatter.format(java.util.Date())
+            val updatedAtStr = formatter.format(java.util.Date())
+
+
+            val location = Location(
+                id = "", // Firebase generates
+                ownerId = userId,
+                ownerUsername = username,
+                name = locationName,
+                description = description,
+                tags = tags,
+                latitude = gpsCoordinates?.first ?: 0.0,
+                longitude = gpsCoordinates?.second ?: 0.0,
+                createdAt = createdAtStr,
+                updatedAt = null
+            )
+
+            uiMessage = Triple("Saving location...", MsgType.LOADING, null)
+
+            db.collection("locations")
+                .add(location)
+                .addOnSuccessListener {
+                    uiMessage = Triple(
+                        "",
+                        MsgType.SUCCESS,
+                        null )
+                    println("Saved successfully")
+                    onSuccess()
+                }
+                .addOnFailureListener {
+                    uiMessage = Triple(
+                        "Error saving location",
+                        MsgType.ERROR,
+                        null )
+                    println("Error: ${it.message}")
+                }
     }
     // clear message from ui display
     fun clearMessage() {
@@ -89,15 +138,16 @@ class LocationViewModel : ViewModel() {
             tags = tags + tag
         } else {
             if (tags.contains(tag)) {
-                uiMessage = "Tag already exists" to MsgType.ERROR
-            }
+                uiMessage = Triple(
+                    "Tag already exists",
+                    MsgType.ERROR,
+                    null ) }
         }
     }
     fun removeTag(tag: String) {
         tags = tags - tag
     }
 
-    // clear form
     fun clearForm() {
         locationName = ""
         description = ""
