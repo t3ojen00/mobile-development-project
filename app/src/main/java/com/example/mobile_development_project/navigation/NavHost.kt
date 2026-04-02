@@ -13,6 +13,7 @@ import com.example.mobile_development_project.ui.screens.EditLocationScreen
 import com.example.mobile_development_project.ui.screens.FavoritesScreen
 import com.example.mobile_development_project.ui.screens.LocationDetailScreen
 import com.example.mobile_development_project.ui.screens.LoginScreen
+import com.example.mobile_development_project.ui.screens.MapScreen
 import com.example.mobile_development_project.ui.screens.RegisterScreen
 import com.example.mobile_development_project.ui.screens.SearchLocationScreen
 import com.example.mobile_development_project.ui.screens.UserProfileScreen
@@ -56,12 +57,16 @@ fun Navigation(
         }
 
         composable(NavRoutes.Map) {
-            MapScreen()
+            MapScreen(navController = navController)
         }
 
         composable(NavRoutes.LocationDetail) { backStackEntry ->
             val locationId = backStackEntry.arguments?.getString("id")
-            LocationDetailScreen(locationId)
+
+            LocationDetailScreen(
+                navController = navController,
+                locationId = locationId
+            )
         }
 
         composable(NavRoutes.AddLocation) {
