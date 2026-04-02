@@ -1,5 +1,4 @@
 plugins {
-    id("com.google.gms.google-services") version "4.4.0"
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
@@ -45,7 +44,7 @@ android {
 
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.2.0"))
-    implementation("com.google.firebase:firebase-firestore-ktx")
+    //implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("androidx.navigation:navigation-compose:2.9.7")
     implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.androidx.core.ktx)
