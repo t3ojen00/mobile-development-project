@@ -3,6 +3,7 @@ package com.example.mobile_development_project.navigation
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,6 +15,7 @@ import com.example.mobile_development_project.ui.screens.FavoritesScreen
 import com.example.mobile_development_project.ui.screens.LocationDetailScreen
 import com.example.mobile_development_project.ui.screens.LoginScreen
 import com.example.mobile_development_project.ui.screens.MapScreen
+import com.example.mobile_development_project.ui.screens.MapSelectionScreen
 import com.example.mobile_development_project.ui.screens.RegisterScreen
 import com.example.mobile_development_project.ui.screens.SearchLocationScreen
 import com.example.mobile_development_project.ui.screens.UserProfileScreen
@@ -70,7 +72,13 @@ fun Navigation(
         }
 
         composable(NavRoutes.AddLocation) {
-            AddLocationScreen()
+            AddLocationScreen(navController = navController)
+        }
+
+        composable(NavRoutes.SelectFromMap) {
+            MapSelectionScreen(
+                navController = navController,
+            )
         }
 
         composable(NavRoutes.EditLocation) { backStackEntry ->
