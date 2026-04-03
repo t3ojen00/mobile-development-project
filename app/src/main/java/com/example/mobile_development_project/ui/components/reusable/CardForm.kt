@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.example.mobile_development_project.ui.theme.cardColor
-import com.example.mobile_development_project.viewModels.LocationViewModel
+import com.example.mobile_development_project.viewModels.AddLocationViewModel
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -39,11 +39,15 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.NavHostController
 import com.example.mobile_development_project.data.models.ErrorCause
+import com.example.mobile_development_project.navigation.NavRoutes
 
 @Composable
 fun CardFormComponent(
-    viewModel: LocationViewModel
+    viewModel: AddLocationViewModel,
+    navController: NavHostController
 ) {
 
     val focusManager = LocalFocusManager.current
@@ -54,6 +58,12 @@ fun CardFormComponent(
     val context = LocalContext.current
     var isLoading by remember { mutableStateOf(false) }
 
+    // listen and receive selected coordinates (lat, lng) from MapSelectionScreen and store in ViewModel
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    savedStateHandle?.getLiveData<Pair<Double, Double>>("selected_location")?.observe(LocalLifecycleOwner.current) {
+        selectedCoordinates ->
+            viewModel.setSelectedLocation(selectedCoordinates.first, selectedCoordinates.second)
+    }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -95,6 +105,8 @@ fun CardFormComponent(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight(),
+        shape = CardDefaults.elevatedShape,
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
 
@@ -202,13 +214,13 @@ fun CardFormComponent(
                     DropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },
-                        Modifier.padding(12.dp)
+                        Modifier.padding(4.dp)
                     ) {
                         DropdownMenuItem(
                             text = { Text("Select from map") },
                             onClick = {
                                 expanded = false
-                            // TODO: open map
+                                navController.navigate(NavRoutes.SelectFromMap)
                             }
                         )
 
