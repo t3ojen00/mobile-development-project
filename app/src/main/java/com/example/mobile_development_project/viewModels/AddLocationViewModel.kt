@@ -4,18 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.viewModelScope
 import com.example.mobile_development_project.data.models.ErrorCause
 import com.example.mobile_development_project.data.models.MsgType
 import com.example.mobile_development_project.data.models.Location
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 
-class LocationViewModel : ViewModel() {
+class AddLocationViewModel : ViewModel() {
 
     val db = FirebaseFirestore.getInstance()
 
@@ -29,6 +27,8 @@ class LocationViewModel : ViewModel() {
         private set
     var gpsCoordinates by mutableStateOf<Pair<Double, Double>?>(null) // long & lat
         private set
+    var selectedLocation by mutableStateOf<Pair<Double, Double>?>(null)
+        private set
 
     // ui messages
     var uiMessage by mutableStateOf<Triple<String, MsgType, ErrorCause?>?>(null)
@@ -41,10 +41,22 @@ class LocationViewModel : ViewModel() {
     fun onDescriptionChange(value: String) {
         description = value
     }
+
+    fun formatCoordinates(value: Double): String {
+        return String.format(Locale.US, "%.2f", value) // decimals separated by dot (.) instead of comma
+    }
     fun setGpsCoordinates(lat: Double, lng: Double) {
         gpsCoordinates = Pair(lat, lng)
         uiMessage = Triple(
-            "GPS coordinates set:\n${gpsCoordinates?.first}, ${gpsCoordinates?.second}",
+            "GPS coordinates set:\n ${formatCoordinates(lat)}, ${formatCoordinates(lng)}",
+            MsgType.SUCCESS,
+            null
+        )
+    }
+    fun setSelectedLocation(lat: Double, lon: Double) {
+        selectedLocation = Pair(lat, lon)
+        uiMessage = Triple(
+            "Selected location:\n${formatCoordinates(lat)}, ${formatCoordinates(lon)}",
             MsgType.SUCCESS,
             null
         )
@@ -72,8 +84,9 @@ class LocationViewModel : ViewModel() {
             setError(ErrorCause.BLANK_FIELDS)
             return
         }
-        // validate gps coordinates are set
-        if (gpsCoordinates == null) {
+        // validate coordinates are set
+        val coordinates = selectedLocation ?: gpsCoordinates
+        if (coordinates == null) {
             setError(ErrorCause.COORDINATES_MISSING)
             return
         }
@@ -101,8 +114,8 @@ class LocationViewModel : ViewModel() {
                 name = locationName,
                 description = description,
                 tags = tags,
-                latitude = gpsCoordinates?.first ?: 0.0,
-                longitude = gpsCoordinates?.second ?: 0.0,
+                latitude = coordinates.first,
+                longitude = coordinates.second,
                 createdAt = createdAtStr,
                 updatedAt = null
             )
