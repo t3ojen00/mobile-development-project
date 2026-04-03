@@ -23,9 +23,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.mobile_development_project.ui.components.reusable.CardFormComponent
 import com.example.mobile_development_project.ui.components.reusable.PrimaryButton
-import com.example.mobile_development_project.viewModels.LocationViewModel
+import com.example.mobile_development_project.viewModels.AddLocationViewModel
 import com.example.mobile_development_project.data.models.MsgType
 import com.example.mobile_development_project.ui.components.reusable.Overlay
 import com.example.mobile_development_project.ui.theme.errorMsg
@@ -35,7 +38,8 @@ import com.example.mobile_development_project.ui.theme.successMsg
 @Composable
 fun AddLocationScreen(
     modifier: Modifier = Modifier,
-    viewModel: LocationViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: AddLocationViewModel = viewModel(),
+    navController: NavHostController
 ) {
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
@@ -55,7 +59,7 @@ fun AddLocationScreen(
                 )
 
         ) {
-            CardFormComponent(viewModel = viewModel)
+            CardFormComponent(viewModel = viewModel, navController = navController)
 
             Spacer(modifier = Modifier.height(8.dp))
 
