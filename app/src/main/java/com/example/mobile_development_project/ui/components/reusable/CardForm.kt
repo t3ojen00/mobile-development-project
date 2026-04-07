@@ -1,6 +1,9 @@
 package com.example.mobile_development_project.ui.components.reusable
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,19 +22,75 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.example.mobile_development_project.ui.theme.cardColor
-import com.example.mobile_development_project.viewModels.LocationViewModel
+import com.example.mobile_development_project.viewModels.AddLocationViewModel
 import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.platform.LocalContext
 import com.example.mobile_development_project.data.models.Image
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
+import android.Manifest
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.NavHostController
+import com.example.mobile_development_project.data.models.ErrorCause
+import com.example.mobile_development_project.navigation.NavRoutes
 
 @Composable
 fun CardFormComponent(
-    viewModel: LocationViewModel
+    viewModel: AddLocationViewModel,
+    navController: NavHostController
 ) {
 
     val focusManager = LocalFocusManager.current
     var showTagInput by remember { mutableStateOf(false) }
     var tagInput by remember { mutableStateOf("") }
+
+    var expanded by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    var isLoading by remember { mutableStateOf(false) }
+
+    // listen and receive selected coordinates (lat, lng) from MapSelectionScreen and store in ViewModel
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    savedStateHandle?.getLiveData<Pair<Double, Double>>("selected_location")?.observe(LocalLifecycleOwner.current) {
+        selectedCoordinates ->
+            viewModel.setSelectedLocation(selectedCoordinates.first, selectedCoordinates.second)
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            isLoading = true
+            val cancellationToken = CancellationTokenSource().token
+            val client = LocationServices.getFusedLocationProviderClient(context)
+            client.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationToken)
+                .addOnSuccessListener { location ->
+                    isLoading = false
+                        if (location != null) {
+                            viewModel.setGpsCoordinates(location.latitude, location.longitude)
+                        } else {
+                            // call works technically but location is null
+                            viewModel.setError(ErrorCause.LOCATION_UNAVAILABLE)
+                        }
+                    }
+                // whole call fails
+                .addOnFailureListener {
+                    viewModel.setError(ErrorCause.LOCATION_FETCH_FAILED)
+                }
+
+        } else {
+            viewModel.setError(ErrorCause.LOCATION_PERMISSION_DENIED)
+        }
+    }
 
     // list of images (uses Image model)
     val initialImages = listOf(
@@ -46,12 +105,16 @@ fun CardFormComponent(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight(),
+        shape = CardDefaults.elevatedShape,
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
+
         Column(modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 24.dp, horizontal = 18.dp)
+            .fillMaxWidth()
+            .padding(vertical = 24.dp, horizontal = 18.dp)
         ) {
+
             TextFieldComponent(
                 value = viewModel.locationName,
                 onValueChange = { viewModel.onLocationNameChange(it)},
@@ -60,7 +123,7 @@ fun CardFormComponent(
                 maxLines = 1,
                 focusManager = focusManager,
                 modifier = Modifier.fillMaxWidth(),
-            )
+                )
             Spacer(modifier = Modifier.height(12.dp))
 
             TextFieldComponent(
@@ -73,7 +136,7 @@ fun CardFormComponent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight(),
-            )
+                )
             Spacer(modifier = Modifier.height(12.dp))
 
             if (!showTagInput) {
@@ -81,7 +144,7 @@ fun CardFormComponent(
                     label = "Add tag",
                     onClick = { showTagInput = true },
                     modifier = Modifier.width(100.dp)
-                )
+                    )
             }
             if (showTagInput) {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -98,7 +161,7 @@ fun CardFormComponent(
                         modifier = Modifier
                             .weight(1f) // reserves 1/2 of space
                             .padding(end = 8.dp),
-                    )
+                        )
 
                     Spacer(modifier = Modifier.width(12.dp))
 
@@ -106,10 +169,9 @@ fun CardFormComponent(
                         label = "Save tag",
                         enabled = tagInput.isNotBlank(), // input field can't be empty
                         onClick = {
-                                viewModel.addTag(tagInput)
-                                tagInput = ""
-                                showTagInput = false
-                            },
+                            viewModel.addTag(tagInput)
+                            tagInput = ""
+                            showTagInput = false },
                         modifier = Modifier.weight(1f) // reserves 1/2 of space
                     )
                 }
@@ -137,11 +199,40 @@ fun CardFormComponent(
             Spacer(modifier = Modifier.height(12.dp))
 
             Row( modifier = Modifier.fillMaxWidth()) {
-                PrimaryButton(
-                    label = "Select location",
-                    onClick = { },
-                    modifier = Modifier.weight(1f)
-                    )
+
+                Box(modifier = Modifier
+                    .weight(1f)
+                    .wrapContentSize(Alignment.TopStart)
+                ) {
+
+                    PrimaryButton(
+                        label = "Select location",
+                        onClick = { expanded = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        )
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        Modifier.padding(4.dp)
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Select from map") },
+                            onClick = {
+                                expanded = false
+                                navController.navigate(NavRoutes.SelectFromMap)
+                            }
+                        )
+
+                        DropdownMenuItem(
+                            text = { Text("Allow access to GPS") },
+                            onClick = {
+                                expanded = false
+                                permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                            }
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.width(16.dp))
 
@@ -151,19 +242,22 @@ fun CardFormComponent(
                     modifier = Modifier.weight(1f)
                 )
             }
+            if (isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = Color.White
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(20.dp))
 
             ImageCarousel(items = images)
 
-            // other implementation with smaller images and dots indicating carousel pages
-            /*PagerCarousel(
-                items = listOf("image1", "image2", "image3") // mock
-            ) {
-                ImagePlaceholder(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-            }*/
         }
     }
 }

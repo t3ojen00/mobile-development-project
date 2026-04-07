@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.ui.unit)
     implementation(libs.androidx.compose.material.core)
+    implementation(libs.play.services.location)
     //implementation(libs.firebase.firestore.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
