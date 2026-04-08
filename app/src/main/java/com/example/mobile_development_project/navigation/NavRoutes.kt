@@ -12,6 +12,10 @@ object NavRoutes {
     const val UserProfile = "profile"
     const val UserProfileWithId = "user/{id}"
 
+    const val UserImages = "user-images"
+    const val UserLocations = "user-locations"
+
+    const val Settings = "settings"
     const val Favorites = "favorites"
     const val Admin = "admin"
     const val Search = "search"
