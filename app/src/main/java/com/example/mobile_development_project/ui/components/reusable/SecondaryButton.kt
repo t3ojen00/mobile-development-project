@@ -1,5 +1,6 @@
 package com.example.mobile_development_project.ui.components.reusable
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -19,6 +20,7 @@ fun SecondaryButton(
         contentColor = MaterialTheme.colorScheme.onSecondary
     ),
     enabled: Boolean = true, // initially enabled and clickable
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding
 )
 {
     Button(
@@ -26,6 +28,7 @@ fun SecondaryButton(
         modifier = modifier, // initially just small btn, but make bigger with modifier or use the PrimaryButton
         colors = colors,
         enabled = enabled,
+        contentPadding = contentPadding
     ) {
         Text(label)
     }
