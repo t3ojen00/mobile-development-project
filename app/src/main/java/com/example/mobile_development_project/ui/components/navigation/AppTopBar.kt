@@ -37,6 +37,7 @@ fun TopBar(navController: NavHostController) {
         currentRoute == NavRoutes.Favorites -> "Favorites"
         currentRoute == NavRoutes.Admin -> "Admin"
         currentRoute == NavRoutes.Search -> "Search location"
+        currentRoute == NavRoutes.SelectFromMap -> "Select location"
 
         currentRoute?.startsWith("location/") == true -> "Location details"
         currentRoute?.startsWith("edit-location/") == true -> "Edit location"
