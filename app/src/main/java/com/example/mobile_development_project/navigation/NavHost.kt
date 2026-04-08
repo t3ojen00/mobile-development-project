@@ -1,5 +1,8 @@
 package com.example.mobile_development_project.navigation
 
+import SettingsScreen
+import UserImagesScreen
+import UserLocationsScreen
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -87,16 +90,34 @@ fun Navigation(
         }
 
         composable(NavRoutes.UserProfile) {
-            UserProfileScreen("current-user")
+            UserProfileScreen(
+                userId = "current-user",
+                navController = navController
+            )
         }
 
         composable(NavRoutes.UserProfileWithId) { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("id")
-            UserProfileScreen(userId)
+            UserProfileScreen(
+                userId = userId,
+                navController = navController
+            )
         }
 
         composable(NavRoutes.Favorites) {
             FavoritesScreen()
+        }
+
+        composable(NavRoutes.UserImages) {
+            UserImagesScreen()
+        }
+
+        composable(NavRoutes.Settings) {
+            SettingsScreen()
+        }
+
+        composable(NavRoutes.UserLocations) {
+            UserLocationsScreen()
         }
 
         composable(NavRoutes.Admin) {
