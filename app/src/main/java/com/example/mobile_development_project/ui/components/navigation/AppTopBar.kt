@@ -30,7 +30,7 @@ fun TopBar(navController: NavHostController) {
 
     // define title based on route
     val currentTitle = when {
-        currentRoute == NavRoutes.Map -> "Location scout"
+        currentRoute == NavRoutes.Map -> "Photo location scout"
         currentRoute == NavRoutes.Login -> "Login"
         currentRoute == NavRoutes.Register -> "Register"
         currentRoute == NavRoutes.AddLocation -> "Add location"
@@ -42,7 +42,7 @@ fun TopBar(navController: NavHostController) {
         currentRoute?.startsWith("edit-location/") == true -> "Edit location"
         currentRoute?.startsWith("user/") == true -> "Profile"
 
-        else -> "Location scout"
+        else -> "Photo location scout"
     }
     // set the title on topbar dynamically based on the current screen
     CenterAlignedTopAppBar(
