@@ -18,6 +18,9 @@ fun createMapMarker(
 ): Drawable {
 
     val drawable = ContextCompat.getDrawable(context, resId) as VectorDrawable
+    color?.let {
+        drawable.setTint(it)
+    }
 
     val bitmap = Bitmap.createBitmap(
         drawable.intrinsicWidth,

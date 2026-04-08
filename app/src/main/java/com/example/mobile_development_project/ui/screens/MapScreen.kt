@@ -1,14 +1,18 @@
 package com.example.mobile_development_project.ui.screens
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
+import com.example.mobile_development_project.R
 import com.example.mobile_development_project.navigation.NavRoutes
+import com.example.mobile_development_project.ui.createMapMarker
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -17,6 +21,9 @@ import org.osmdroid.views.overlay.Marker
 @Composable
 fun MapScreen(navController: NavHostController) {
     val context = LocalContext.current
+    // custom marker
+    val markerColor = MaterialTheme.colorScheme.primary.toArgb()
+    val scaledMarker = createMapMarker(context, R.drawable.location_marker, 120, markerColor)
 
     val mapView = remember {
         MapView(context).apply {
@@ -27,12 +34,12 @@ fun MapScreen(navController: NavHostController) {
             controller.setZoom(12.0)
             controller.setCenter(startPoint)
 
-
             //test marker to see that the locationdetailscreen works (it doesnt render because mock id doesnt exist in firebase)
-          /*  val marker = Marker(this).apply {
+           val marker = Marker(this).apply {
                 position = startPoint
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 title = "Test Location"
+                icon = scaledMarker
 
                 setOnMarkerClickListener { _, _ ->
                     navController.navigate(
@@ -42,7 +49,8 @@ fun MapScreen(navController: NavHostController) {
                 }
             }
 
-            overlays.add(marker)*/
+            overlays.add(marker)
+            invalidate()
         }
     }
 
