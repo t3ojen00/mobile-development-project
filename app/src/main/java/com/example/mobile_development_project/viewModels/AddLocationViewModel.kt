@@ -1,5 +1,6 @@
 package com.example.mobile_development_project.viewModels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
@@ -7,6 +8,7 @@ import androidx.compose.runtime.setValue
 import com.example.mobile_development_project.data.models.ErrorCause
 import com.example.mobile_development_project.data.models.MsgType
 import com.example.mobile_development_project.data.models.Location
+import com.example.mobile_development_project.helpers.ErrorMapper
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
@@ -61,17 +63,13 @@ class AddLocationViewModel : ViewModel() {
             null
         )
     }
-    fun setError(cause: ErrorCause? = null) {
+    fun setError(
+        cause: ErrorCause? = null,
+        exception: Exception? = null) {
+        Log.e("AddLocationViewModel", "ERROR", exception)
+
         uiMessage = Triple(
-            when (cause) {
-                    ErrorCause.LOCATION_UNAVAILABLE -> "Location not available, try again outdoors or enable GPS"
-                    ErrorCause.LOCATION_FETCH_FAILED -> "Failed to get location, try again"
-                    ErrorCause.LOCATION_PERMISSION_DENIED -> "Location permission denied, please allow in settings"
-                    ErrorCause.COORDINATES_MISSING -> "Coordinates missing"
-                    ErrorCause.BLANK_FIELDS -> "Fields can't be empty"
-                    ErrorCause.USER_ERROR -> "Error finding user"
-                   else -> "Unknown error"
-                },
+            ErrorMapper.getMessage(cause),
             MsgType.ERROR,
             cause
         )
@@ -129,12 +127,8 @@ class AddLocationViewModel : ViewModel() {
                     println("Saved successfully")
                     onSuccess()
                 }
-                .addOnFailureListener {
-                    uiMessage = Triple(
-                        "Error saving location",
-                        MsgType.ERROR,
-                        null )
-                    println("Error: ${it.message}")
+                .addOnFailureListener { e ->
+                    setError(ErrorCause.GENERAL_SAVE_FAIL, e)
                 }
     }
     // clear message from ui display
@@ -148,10 +142,10 @@ class AddLocationViewModel : ViewModel() {
             tags = tags + tag
         } else {
             if (tags.contains(tag)) {
-                uiMessage = Triple(
-                    "Tag already exists",
-                    MsgType.ERROR,
-                    null ) }
+                setError(ErrorCause.TAG_EXISTS)
+            } else {
+                setError(ErrorCause.BLANK_FIELDS)
+            }
         }
     }
     fun removeTag(tag: String) {
