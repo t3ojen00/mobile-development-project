@@ -14,7 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.mobile_development_project.R
 import com.example.mobile_development_project.navigation.NavRoutes
-import com.example.mobile_development_project.ui.createMapMarker
+import com.example.mobile_development_project.helpers.createMapMarker
 import com.example.mobile_development_project.viewModels.MapViewModel
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
