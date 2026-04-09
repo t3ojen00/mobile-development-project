@@ -2,7 +2,6 @@ package com.example.mobile_development_project.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +20,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,6 +37,14 @@ import com.example.mobile_development_project.ui.theme.Burgundy
 import com.example.mobile_development_project.ui.theme.OrangeAccent
 import com.example.mobile_development_project.ui.theme.ScreenBackground
 import com.example.mobile_development_project.viewModels.ProfileViewModel
+import androidx.compose.material3.Tab
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.example.mobile_development_project.ui.components.reusable.FollowingContent
+import com.example.mobile_development_project.ui.components.reusable.UserImagesContent
+import com.example.mobile_development_project.ui.components.reusable.UserLocationContent
 
 @Composable
 fun UserProfileScreen(
@@ -45,10 +53,14 @@ fun UserProfileScreen(
     viewModel: ProfileViewModel = viewModel()
 ) {
     LaunchedEffect(Unit) {
-        viewModel.loadUser()
+        android.util.Log.d("UserProfileScreen", "loadProfileData called")
+        viewModel.loadProfileData()
     }
 
     val user = viewModel.user
+    val userLocations = viewModel.userLocations
+    var selectedTab by remember { mutableStateOf(0) }
+
 
     if (viewModel.isLoading) {
         Box(
@@ -149,37 +161,54 @@ fun UserProfileScreen(
 
         HorizontalDivider(color = Color.Gray)
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 14.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+
+        PrimaryTabRow(
+            selectedTabIndex = selectedTab,
+            containerColor = ScreenBackground,
+            contentColor = Burgundy
         ) {
-            Text(
-                text = "My locations",
-                color = Color.DarkGray,
-                modifier = Modifier
-                    .clickable { navController.navigate(NavRoutes.UserLocations) }
-                    .padding(4.dp)
+            Tab(
+                selected = selectedTab == 0,
+                onClick = { selectedTab = 0 },
+                text = { Text("My locations") },
+                selectedContentColor = Burgundy,
+                unselectedContentColor = Color.DarkGray
             )
-
-            Text(
-                text = "My images",
-                color = Color.DarkGray,
-                modifier = Modifier
-                    .clickable { navController.navigate(NavRoutes.UserImages) }
-                    .padding(4.dp)
+            Tab(
+                selected = selectedTab == 1,
+                onClick = { selectedTab = 1 },
+                text = { Text("My images") },
+                selectedContentColor = Burgundy,
+                unselectedContentColor = Color.DarkGray
             )
-
-            Text(
-                text = "Following",
-                color = Color.DarkGray,
-                modifier = Modifier
-                    .clickable { navController.navigate(NavRoutes.Favorites) }
-                    .padding(4.dp)
+            Tab(
+                selected = selectedTab == 2,
+                onClick = { selectedTab = 2 },
+                text = { Text("Following") },
+                selectedContentColor = Burgundy,
+                unselectedContentColor = Color.DarkGray
             )
         }
 
         HorizontalDivider(color = Color.Gray)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        when (selectedTab) {
+            0 -> UserLocationContent(
+                locations = userLocations,
+                navController = navController,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            1 -> UserImagesContent(
+                locations = userLocations,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            2 -> FollowingContent(
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
