@@ -2,6 +2,8 @@ package com.example.mobile_development_project.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -9,7 +11,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.example.mobile_development_project.R
@@ -19,17 +23,20 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.views.overlay.MapEventsOverlay
 
 @Composable
 fun MapSelectionScreen(
     navController: NavHostController,
 ) {
     val context = LocalContext.current
-    var selectedPoint by remember { mutableStateOf<org.osmdroid.util.GeoPoint?>(null) }
+    var selectedPoint by remember { mutableStateOf<GeoPoint?>(null) }
 
     // custom marker
+    val markerColor = MaterialTheme.colorScheme.primary.toArgb()
     val scaledMarker = remember {
-        createMapMarker(context, R.drawable.location_marker, 150)
+        createMapMarker(context, R.drawable.location_marker, 150, markerColor)
     }
 
     // create OpenStreet map
@@ -47,9 +54,9 @@ fun MapSelectionScreen(
 
     // overlay and tap listener
     DisposableEffect(mapView) {
-        val eventsOverlay = org.osmdroid.views.overlay.MapEventsOverlay(
-            object : org.osmdroid.events.MapEventsReceiver {
-                override fun singleTapConfirmedHelper(p: org.osmdroid.util.GeoPoint?): Boolean {
+        val eventsOverlay = MapEventsOverlay(
+            object : MapEventsReceiver {
+                override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
                     p?.let { it ->
                         selectedPoint = it
                         mapView.overlays.removeAll { it is Marker } // only one marker visible, not all clicks
@@ -64,7 +71,7 @@ fun MapSelectionScreen(
                     }
                     return true
                 }
-                override fun longPressHelper(p: org.osmdroid.util.GeoPoint): Boolean = false
+                override fun longPressHelper(p: GeoPoint): Boolean = false
             }
         )
         mapView.overlays.add(eventsOverlay)
@@ -94,7 +101,8 @@ fun MapSelectionScreen(
                 }
                 navController.popBackStack()
             },
-            label = "Confirm location"
+            label = "Confirm location",
+            modifier = Modifier.padding(16.dp)
         )
     }
 }

@@ -104,20 +104,17 @@ class AddLocationViewModel : ViewModel() {
                 "dd.MM.yyyy HH:mm", Locale("fi", "FI")
             )
             val createdAtStr = formatter.format(java.util.Date())
-            val updatedAtStr = formatter.format(java.util.Date())
-
 
             val location = Location(
-                id = "", // Firebase generates
                 ownerId = userId,
                 ownerUsername = username,
+                status = "pending",
                 name = locationName,
                 description = description,
                 tags = tags,
                 latitude = coordinates.first,
                 longitude = coordinates.second,
                 createdAt = createdAtStr,
-                updatedAt = null
             )
 
             uiMessage = Triple("Saving location...", MsgType.LOADING, null)

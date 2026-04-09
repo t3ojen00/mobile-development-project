@@ -121,7 +121,7 @@ fun Navigation(
         }
 
         composable(NavRoutes.Admin) {
-            AdminScreen()
+            AdminScreen(navController = navController)
         }
 
         composable(NavRoutes.Search) {

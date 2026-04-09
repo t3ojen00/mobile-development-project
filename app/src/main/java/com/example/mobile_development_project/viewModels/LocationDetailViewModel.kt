@@ -61,11 +61,11 @@ class LocationDetailViewModel : ViewModel() {
                     name = document.getString("name") ?: "",
                     description = document.getString("description") ?: "",
                     tags = document.get("tags") as? List<String> ?: emptyList(),
-                    latitude = document.getDouble("lat") ?: 0.0,
-                    longitude = document.getDouble("lng") ?: 0.0,
+                    latitude = document.getDouble("latitude") ?: 0.0,
+                    longitude = document.getDouble("longitude") ?: 0.0,
                     previewImageUrl = document.getString("previewImageUrl") ?: "",
                     status = document.getString("status") ?: "pending",
-                    createdAt = document.getLong("createdAt")?.toString(),
+                    createdAt = document.getString("createdAt")?: "",
                     updatedAt = document.getLong("updatedAt")?.toString(),
                     favoritesCount = document.getLong("favoritesCount")?.toInt() ?: 0
                 )
