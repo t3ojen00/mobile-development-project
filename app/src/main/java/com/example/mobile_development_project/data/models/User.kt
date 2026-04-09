@@ -6,7 +6,7 @@ data class User(
     val username: String = "",
     val displayName: String = "",
     val role: String = "user",
-    val createdAt: Long? = null,
-    val updatedAt: Long? = null,
+    val createdAt: String? = "",
+    val updatedAt: String? = "",
     val isActive: Boolean = true
 )
