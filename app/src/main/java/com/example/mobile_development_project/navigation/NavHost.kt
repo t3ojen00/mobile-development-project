@@ -120,8 +120,9 @@ fun Navigation(
             UserLocationsScreen()
         }
 
-        composable(NavRoutes.Admin) {
-            AdminScreen(navController = navController)
+        composable(NavRoutes.Admin) { backStackEntry ->
+            val role = backStackEntry.arguments?.getString("role") ?: ""
+            AdminScreen(navController = navController, role = role)
         }
 
         composable(NavRoutes.Search) {

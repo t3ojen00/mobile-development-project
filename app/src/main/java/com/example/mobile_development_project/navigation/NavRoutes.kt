@@ -17,7 +17,7 @@ object NavRoutes {
 
     const val Settings = "settings"
     const val Favorites = "favorites"
-    const val Admin = "admin"
+    const val Admin = "admin/{role}"
     const val Search = "search"
     const val SelectFromMap =  "select-from-map"
 }
