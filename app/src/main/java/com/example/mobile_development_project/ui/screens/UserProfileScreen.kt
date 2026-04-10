@@ -15,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -149,12 +148,16 @@ fun UserProfileScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // quick temp nav to admin view
-        Button(
-            onClick = { navController.navigate(NavRoutes.Admin) },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Admin")
+        if (user?.role == "admin" || user?.role == "moderator") {
+
+            PrimaryButton(
+                label = when (user.role) {
+                    "admin" -> "Admin actions"
+                    "moderator" -> "Moderator actions"
+                    else -> ""
+                    },
+                onClick = { navController.navigate("admin/${user.role}") },
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
