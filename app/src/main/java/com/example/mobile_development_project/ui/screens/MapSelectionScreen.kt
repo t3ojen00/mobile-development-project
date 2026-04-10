@@ -18,7 +18,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import com.example.mobile_development_project.R
 import com.example.mobile_development_project.ui.components.reusable.PrimaryButton
-import com.example.mobile_development_project.ui.createMapMarker
+import com.example.mobile_development_project.helpers.createMapMarker
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.MapView

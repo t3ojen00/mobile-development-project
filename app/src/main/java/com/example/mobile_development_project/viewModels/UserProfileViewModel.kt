@@ -40,8 +40,8 @@ class ProfileViewModel : ViewModel() {
                         username = doc.getString("username") ?: "",
                         displayName = doc.getString("displayName") ?: "",
                         role = doc.getString("role") ?: "user",
-                        createdAt = doc.getLong("createdAt"),
-                        updatedAt = doc.getLong("updatedAt"),
+                        createdAt = doc.getString("createdAt"),
+                        updatedAt = doc.getString("updatedAt"),
                         isActive = doc.getBoolean("isActive") ?: true
                     )
                 }

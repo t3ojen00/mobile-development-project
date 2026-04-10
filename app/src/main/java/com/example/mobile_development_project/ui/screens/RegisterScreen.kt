@@ -202,7 +202,8 @@ fun RegisterScreen(
                             if (localError == null) {
                                 authViewModel.registerUser(
                                     email = email.trim(),
-                                    password = password.trim()
+                                    password = password.trim(),
+                                    nickname = nickname.trim()
                                 )
                             }
                         },
