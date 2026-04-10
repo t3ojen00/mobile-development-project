@@ -105,7 +105,7 @@ fun Navigation(
         }
 
         composable(NavRoutes.Favorites) {
-            FavoritesScreen()
+            FavoritesScreen(navController = navController)
         }
 
         composable(NavRoutes.UserImages) {

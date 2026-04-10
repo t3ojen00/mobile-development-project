@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.unit)
     implementation(libs.androidx.compose.material.core)
     implementation(libs.play.services.location)
+    implementation("io.coil-kt:coil-compose:2.6.0")
     //implementation(libs.firebase.firestore.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
