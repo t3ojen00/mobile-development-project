@@ -1,10 +1,15 @@
 package com.example.mobile_development_project.viewModels
 
 import androidx.lifecycle.ViewModel
+import com.example.mobile_development_project.data.models.User
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.text.SimpleDateFormat
+import java.util.Locale
+import kotlin.String
 
 data class AuthUiState(
     val isLoading: Boolean = false,
@@ -23,7 +28,7 @@ class AuthViewModel : ViewModel() {
     private val _loginState = MutableStateFlow(AuthUiState())
     val loginState: StateFlow<AuthUiState> = _loginState
 
-    fun registerUser(email: String, password: String) {
+    fun registerUser(email: String, password: String, nickname: String) {
         _registerState.value = AuthUiState(isLoading = true)
 
         auth.createUserWithEmailAndPassword(email, password)
@@ -37,9 +42,24 @@ class AuthViewModel : ViewModel() {
                     return@addOnSuccessListener
                 }
 
-                val userData = hashMapOf(
-                    "uid" to uid,
-                    "email" to email
+                val profileUpdates = userProfileChangeRequest {
+                    displayName = nickname
+                }
+                result.user?.updateProfile(profileUpdates)
+
+                val formatter = SimpleDateFormat(
+                    "dd.MM.yyyy HH:mm", Locale("fi", "FI")
+                )
+                val createdAtStr = formatter.format(java.util.Date())
+
+                val userData = User (
+                    id = uid,
+                    email = email,
+                    username = nickname,
+                    displayName = nickname,
+                    role = "user",
+                    createdAt = createdAtStr,
+                    isActive = true
                 )
 
                 firestore.collection("users")
