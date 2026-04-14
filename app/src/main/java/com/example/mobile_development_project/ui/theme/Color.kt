@@ -30,3 +30,8 @@ val ScreenBackground = Color(0xFFF5F5F5)
 
 val FieldBackground = Color(0xFFFFFFFF)
 val Logout = Color(0xFFA10521)
+val rejectButton = Color(0xFF3A0811)
+
+val adminCards =  Color(0xFFEEE7E7)
+
+
