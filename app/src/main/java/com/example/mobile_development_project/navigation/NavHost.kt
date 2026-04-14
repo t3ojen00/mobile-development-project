@@ -47,7 +47,6 @@ fun Navigation(
                 }
             )
         }
-
         composable(NavRoutes.Register) {
             RegisterScreen(
                 onBackClick = {
@@ -117,7 +116,7 @@ fun Navigation(
         }
 
         composable(NavRoutes.Admin) { backStackEntry ->
-            val role = backStackEntry.arguments?.getString("role") ?: ""
+            val role = backStackEntry.arguments?.getString("role")
             AdminScreen(navController = navController, role = role)
         }
 
