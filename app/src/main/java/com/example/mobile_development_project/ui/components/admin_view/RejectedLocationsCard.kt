@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -78,7 +77,6 @@ fun RejectedLocations(
                     containerColor = adminCards
                 ),
                 elevation = CardDefaults.cardElevation(4.dp),
-                //colors = CardDefaults.cardColors(containerColor = cardColor.copy(alpha = 0.5f)),
             ) {
                 Column(
                     modifier = Modifier
@@ -123,10 +121,10 @@ fun RejectedLocations(
                             Text(
                                 text = "$tag ",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier
                                     .background(
-                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f),
                                         shape = RoundedCornerShape(8.dp)
                                     )
                                     .padding(horizontal = 8.dp, vertical = 2.dp)
@@ -240,11 +238,10 @@ fun RejectedLocations(
                             onClick = {
                                 //viewModel.requestEdit(location.id)
                                 viewModel.fetchRejectedLocations()
-                            }, // refresh list
+                            },
                             modifier = Modifier.weight(1.25f),
                             label = "Request edit"
                         )
-                        //Spacer(modifier = Modifier.weight(0.25f))
                     }
 
                 }

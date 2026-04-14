@@ -31,7 +31,7 @@ import com.example.mobile_development_project.ui.components.admin_view.UsersList
 fun AdminScreen(
     viewModel: AdminViewModel = viewModel(),
     navController: NavHostController,
-    role: String
+    role: String?
 ) {
     LaunchedEffect(Unit) {
         viewModel.fetchPendingLocations()
@@ -79,6 +79,7 @@ fun AdminScreen(
                 0 -> PendingLocations(
                     viewModel,
                     navController,
+                    role
                 )
 
                 1 -> UsersList(
@@ -104,7 +105,7 @@ fun AdminScreen(
         }
     }
     else if(role == "moderator"){
-        PendingLocations(viewModel, navController)
+        PendingLocations(viewModel, navController, role)
     }
 }
 

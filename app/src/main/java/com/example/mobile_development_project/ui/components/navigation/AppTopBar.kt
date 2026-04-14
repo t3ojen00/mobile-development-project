@@ -19,7 +19,10 @@ import com.example.mobile_development_project.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(navController: NavHostController) {
+fun TopBar(
+    navController: NavHostController,
+    role: String?
+) {
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
@@ -35,7 +38,7 @@ fun TopBar(navController: NavHostController) {
         currentRoute == NavRoutes.Register -> "Register"
         currentRoute == NavRoutes.AddLocation -> "Add location"
         currentRoute == NavRoutes.Favorites -> "Favorites"
-        currentRoute == NavRoutes.Admin -> "Admin"
+        currentRoute == NavRoutes.Admin -> if (role == "moderator") "Moderator" else "Admin"
         currentRoute == NavRoutes.Search -> "Search location"
         currentRoute == NavRoutes.SelectFromMap -> "Select location"
         currentRoute == NavRoutes.UserProfile -> "Profile"

@@ -1,7 +1,6 @@
 package com.example.mobile_development_project.ui.components.admin_view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,12 +42,11 @@ import com.example.mobile_development_project.ui.theme.adminCards
 import com.example.mobile_development_project.ui.theme.rejectButton
 import java.util.Locale
 
-
-
 @Composable
 fun PendingLocations(
     viewModel: AdminViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    role: String?
 ) {
 
     val locations = viewModel.pendingLocations
@@ -59,7 +57,9 @@ fun PendingLocations(
         modifier = Modifier.fillMaxSize()
     ) {
         item {
-            Spacer(modifier = Modifier.height(14.dp))
+            if (role == "moderator") {
+                Spacer(modifier = Modifier.height(14.dp))
+            }
             Text(
                 "Locations waiting for approval ($locationAmount)",
                 style = MaterialTheme.typography.titleMedium,
@@ -83,7 +83,6 @@ fun PendingLocations(
                     containerColor = adminCards
                 ),
                 elevation = CardDefaults.cardElevation(4.dp),
-                //colors = CardDefaults.cardColors(containerColor = cardColor.copy(alpha = 0.5f)),
             ) {
                 Column(
                     modifier = Modifier
@@ -223,7 +222,6 @@ fun PendingLocations(
                         PrimaryButton(
                             onClick = {
                                 viewModel.rejectLocation(location.id)
-                                viewModel.fetchPendingLocations()
                             },
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.buttonColors(
@@ -238,8 +236,7 @@ fun PendingLocations(
                         PrimaryButton(
                             onClick = {
                                 viewModel.approveLocation(location.id)
-                                viewModel.fetchPendingLocations()
-                            }, // refresh list
+                            },
                             modifier = Modifier.weight(1f),
                             label = "Approve"
                         )

@@ -83,6 +83,7 @@ class AdminViewModel : ViewModel() {
                     MsgType.SUCCESS,
                     null
                 )
+                fetchPendingLocations()
             }
     }
     fun rejectLocation(locationId: String) {
@@ -95,6 +96,8 @@ class AdminViewModel : ViewModel() {
                     MsgType.SUCCESS,
                     null
                 )
+                fetchPendingLocations()
+                fetchRejectedLocations()
             }
     }
     fun fetchAllUsers()
