@@ -2,6 +2,7 @@ package com.example.mobile_development_project.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -44,6 +46,7 @@ import androidx.compose.runtime.setValue
 import com.example.mobile_development_project.ui.components.reusable.FollowingContent
 import com.example.mobile_development_project.ui.components.reusable.UserImagesContent
 import com.example.mobile_development_project.ui.components.reusable.UserLocationContent
+import com.example.mobile_development_project.ui.theme.Logout
 
 @Composable
 fun UserProfileScreen(
@@ -101,9 +104,11 @@ fun UserProfileScreen(
             PrimaryButton(
                 label = "Log out",
                 onClick = { },
-                modifier = Modifier.height(40.dp),
+                modifier = Modifier
+                    .height(40.dp)
+                    .width(110.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Burgundy,
+                    containerColor = Logout,
                     contentColor = Color.White
                 )
             )

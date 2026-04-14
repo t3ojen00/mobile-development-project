@@ -23,13 +23,15 @@ fun ProjectApp() {
         NavRoutes.Register
     )
 
+    val role = backStackEntry?.arguments?.getString("role") ?: ""
+
     val showTopBar = currentRoute !in authRoutes
     val showBottomBar = currentRoute !in authRoutes
 
     Scaffold(
         topBar = {
             if (showTopBar) {
-                TopBar(navController = navController)
+                TopBar(navController = navController, role = role)
             }
         },
         bottomBar = {
