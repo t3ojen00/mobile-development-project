@@ -21,8 +21,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.Tab
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,25 +36,22 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.mobile_development_project.navigation.NavRoutes
+import com.example.mobile_development_project.ui.components.reusable.FollowingContent
 import com.example.mobile_development_project.ui.components.reusable.PrimaryButton
+import com.example.mobile_development_project.ui.components.reusable.UserImagesContent
+import com.example.mobile_development_project.ui.components.reusable.UserLocationContent
 import com.example.mobile_development_project.ui.theme.Burgundy
 import com.example.mobile_development_project.ui.theme.OrangeAccent
 import com.example.mobile_development_project.ui.theme.ScreenBackground
+import com.example.mobile_development_project.viewModels.AuthViewModel
 import com.example.mobile_development_project.viewModels.ProfileViewModel
-import androidx.compose.material3.Tab
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import com.example.mobile_development_project.ui.components.reusable.FollowingContent
-import com.example.mobile_development_project.ui.components.reusable.UserImagesContent
-import com.example.mobile_development_project.ui.components.reusable.UserLocationContent
 
 @Composable
 fun UserProfileScreen(
     userId: String? = null,
     navController: NavHostController,
-    viewModel: ProfileViewModel = viewModel()
+    viewModel: ProfileViewModel = viewModel(),
+    authViewModel: AuthViewModel = viewModel()
 ) {
     LaunchedEffect(Unit) {
         android.util.Log.d("UserProfileScreen", "loadProfileData called")
@@ -59,7 +61,6 @@ fun UserProfileScreen(
     val user = viewModel.user
     val userLocations = viewModel.userLocations
     var selectedTab by remember { mutableStateOf(0) }
-
 
     if (viewModel.isLoading) {
         Box(
@@ -74,9 +75,11 @@ fun UserProfileScreen(
     }
 
     val displayName = when {
-        user == null -> "user XXXX"
+        user == null -> "User"
+        user.displayName.isNotBlank() -> user.displayName
         user.username.isNotBlank() -> user.username
-        else -> user.email
+        user.email.isNotBlank() -> user.email
+        else -> "User"
     }
 
     Column(
@@ -100,7 +103,9 @@ fun UserProfileScreen(
 
             PrimaryButton(
                 label = "Log out",
-                onClick = { },
+                onClick = {
+                    authViewModel.logoutUser()
+                },
                 modifier = Modifier.height(40.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Burgundy,
@@ -129,7 +134,7 @@ fun UserProfileScreen(
                     shape = RoundedCornerShape(20.dp)
                 )
                 .padding(horizontal = 10.dp, vertical = 6.dp)
-        ){
+        ) {
             Icon(
                 imageVector = Icons.Default.Menu,
                 contentDescription = "Settings",
@@ -149,21 +154,21 @@ fun UserProfileScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         if (user?.role == "admin" || user?.role == "moderator") {
-
             PrimaryButton(
                 label = when (user.role) {
                     "admin" -> "Admin actions"
                     "moderator" -> "Moderator actions"
                     else -> ""
-                    },
-                onClick = { navController.navigate("admin/${user.role}") },
+                },
+                onClick = {
+                    navController.navigate("admin/${user.role}")
+                }
             )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         HorizontalDivider(color = Color.Gray)
-
 
         PrimaryTabRow(
             selectedTabIndex = selectedTab,

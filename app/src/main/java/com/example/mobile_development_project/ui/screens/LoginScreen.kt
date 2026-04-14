@@ -34,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mobile_development_project.ui.theme.AuthCardGray
@@ -50,7 +49,7 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit = {},
     authViewModel: AuthViewModel = viewModel()
 ) {
-    var email by remember { mutableStateOf("") }
+    var loginInput by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var localError by remember { mutableStateOf<String?>(null) }
 
@@ -130,16 +129,22 @@ fun LoginScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     AuthField(
-                        value = email,
-                        onValueChange = { email = it },
-                        label = "Email"
+                        value = loginInput,
+                        onValueChange = {
+                            loginInput = it
+                            localError = null
+                        },
+                        label = "Email or username"
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
 
                     AuthField(
                         value = password,
-                        onValueChange = { password = it },
+                        onValueChange = {
+                            password = it
+                            localError = null
+                        },
                         label = "Password",
                         isPassword = true
                     )
@@ -159,15 +164,15 @@ fun LoginScreen(
                     Button(
                         onClick = {
                             localError = when {
-                                email.isBlank() -> "Email is required"
+                                loginInput.isBlank() -> "Email or username is required"
                                 password.isBlank() -> "Password is required"
                                 else -> null
                             }
 
                             if (localError == null) {
                                 authViewModel.loginUser(
-                                    email = email.trim(),
-                                    password = password.trim()
+                                    loginInput = loginInput,
+                                    password = password
                                 )
                             }
                         },
