@@ -11,6 +11,9 @@ import com.example.mobile_development_project.data.models.MsgType
 import com.example.mobile_development_project.helpers.ErrorMapper
 import com.google.firebase.firestore.FirebaseFirestore
 import com.example.mobile_development_project.data.models.User
+import com.google.firebase.auth.FirebaseAuth
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class AdminViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
@@ -18,11 +21,15 @@ class AdminViewModel : ViewModel() {
         private set
     var pendingLocations by mutableStateOf<List<Location>>(emptyList())
         private set
+    var rejectedLocations by mutableStateOf<List<Location>>(emptyList())
+        private set
     var allUsers by mutableStateOf<List<User>>(emptyList())
         private set
-
-    var userRole by mutableStateOf<String?>(null)
-        private set
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+    fun isCurrentUser(userId: String): Boolean {
+        return userId == currentUserId
+    }
+    private val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
 
     fun setError(
         cause: ErrorCause? = null,
@@ -40,23 +47,27 @@ class AdminViewModel : ViewModel() {
             .whereEqualTo("status", "pending")
             .get()
             .addOnSuccessListener { result ->
-                pendingLocations = result.documents.map {
-                    Location(
-                        id = it.id,
-                        ownerId = it.getString("ownerId") ?: "",
-                        ownerUsername = it.getString("ownerUsername") ?: "",
-                        name = it.getString("name") ?: "",
-                        description = it.getString("description") ?: "",
-                        tags = it.get("tags") as? List<String> ?: emptyList(),
-                        latitude = it.getDouble("latitude") ?: 0.0,
-                        longitude = it.getDouble("longitude") ?: 0.0,
-                        previewImageUrl = it.getString("previewImageUrl") ?: "",
-                        status = it.getString("status") ?: "pending",
-                        createdAt = it.getString("createdAt") ?: "",
-                        updatedAt = it.getLong("updatedAt")?.toString() ?: "",
-                        favoritesCount = it.getLong("favoritesCount")?.toInt() ?: 0
-                        )
-                }
+                pendingLocations = result.documents
+                    .map { doc ->
+                        Location(
+                            id = doc.id,
+                            ownerId = doc.getString("ownerId") ?: "",
+                            ownerUsername = doc.getString("ownerUsername") ?: "",
+                            name = doc.getString("name") ?: "",
+                            description = doc.getString("description") ?: "",
+                            tags = doc.get("tags") as? List<String> ?: emptyList(),
+                            latitude = doc.getDouble("latitude") ?: 0.0,
+                            longitude = doc.getDouble("longitude") ?: 0.0,
+                            previewImageUrl = doc.getString("previewImageUrl") ?: "",
+                            status = doc.getString("status") ?: "pending",
+                            createdAt = doc.getString("createdAt") ?: "",
+                            updatedAt = doc.getLong("updatedAt")?.toString() ?: "",
+                            favoritesCount = doc.getLong("favoritesCount")?.toInt() ?: 0
+                            )
+                    }
+                    .sortedBy { location ->
+                        LocalDateTime.parse(location.createdAt, formatter)
+                    }
             }
             .addOnFailureListener { exception ->
                 setError(ErrorCause.GENERAL_FETCH_FAIL, exception)
@@ -74,7 +85,6 @@ class AdminViewModel : ViewModel() {
                 )
             }
     }
-    //
     fun rejectLocation(locationId: String) {
         db.collection("locations")
             .document(locationId)
@@ -87,29 +97,12 @@ class AdminViewModel : ViewModel() {
                 )
             }
     }
-
-    fun updateUserRole(userId: String, newRole: String) {
-        db.collection("users")
-            .document(userId)
-            .update("role", newRole)
-            .addOnSuccessListener {
-                uiMessage = Triple(
-                    "User role updated",
-                    MsgType.SUCCESS,
-                    null
-                )
-            }
-            .addOnFailureListener { exception ->
-                setError(ErrorCause.GENERAL_UPDATE_FAIL, exception)
-            }
-    }
-
     fun fetchAllUsers()
     {
         db.collection("users")
             .get()
             .addOnSuccessListener { result ->
-                val users = result.documents.map {
+                allUsers = result.documents.map {
                     User(
                         id = it.id,
                         email = it.getString("email") ?: "",
@@ -121,10 +114,82 @@ class AdminViewModel : ViewModel() {
                         isActive = it.getBoolean("isActive") ?: true
                     )
                 }
-                allUsers = users
             }
             .addOnFailureListener { exception ->
                 setError(ErrorCause.GENERAL_FETCH_FAIL, exception)
+            }
+    }
+    fun updateUserRole(userId: String, newRole: String) {
+        db.collection("users")
+            .document(userId)
+            .update("role", newRole)
+            .addOnSuccessListener {
+                uiMessage = Triple(
+                    "User role updated",
+                    MsgType.SUCCESS,
+                    null
+                )
+                fetchAllUsers()
+            }
+            .addOnFailureListener { exception ->
+                setError(ErrorCause.GENERAL_UPDATE_FAIL, exception)
+            }
+    }
+
+    fun fetchRejectedLocations() {
+        db.collection("locations")
+            .whereEqualTo("status", "rejected")
+            .get()
+            .addOnSuccessListener { result ->
+                rejectedLocations = result.documents
+                    .map { doc ->
+                        Location(
+                            id = doc.id,
+                            ownerId = doc.getString("ownerId") ?: "",
+                            ownerUsername = doc.getString("ownerUsername") ?: "",
+                            name = doc.getString("name") ?: "",
+                            description = doc.getString("description") ?: "",
+                            tags = doc.get("tags") as? List<String> ?: emptyList(),
+                            latitude = doc.getDouble("latitude") ?: 0.0,
+                            longitude = doc.getDouble("longitude") ?: 0.0,
+                            previewImageUrl = doc.getString("previewImageUrl") ?: "",
+                            status = doc.getString("status") ?: "pending",
+                            createdAt = doc.getString("createdAt") ?: "",
+                        )
+                    }
+                    .sortedBy { location ->
+                        LocalDateTime.parse(location.createdAt, formatter)
+                    }
+            }
+            .addOnFailureListener { exception ->
+                setError(ErrorCause.GENERAL_FETCH_FAIL, exception)
+            }
+    }
+
+    fun deleteLocation(locationId: String) {
+        db.collection("locations")
+            .document(locationId)
+            .delete()
+            .addOnSuccessListener {
+                uiMessage = Triple(
+                    "Location deleted",
+                    MsgType.SUCCESS,
+                    null
+                )
+                fetchRejectedLocations()
+            }
+    }
+    fun deleteUser(userId: String) {
+        db.collection("users")
+            .document(userId)
+            .delete()
+            .addOnSuccessListener {
+                uiMessage = Triple(
+                    "User deleted",
+                    MsgType.SUCCESS,
+                    null
+                )
+                fetchAllUsers()
             }
     }
 }
