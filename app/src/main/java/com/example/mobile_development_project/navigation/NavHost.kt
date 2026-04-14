@@ -76,9 +76,7 @@ fun Navigation(
         }
 
         composable(NavRoutes.SelectFromMap) {
-            MapSelectionScreen(
-                navController = navController,
-            )
+            MapSelectionScreen(navController = navController)
         }
 
         composable(NavRoutes.EditLocation) { backStackEntry ->

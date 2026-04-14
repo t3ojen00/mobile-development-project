@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -24,14 +25,13 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -84,7 +84,7 @@ fun RegisterScreen(
                 }
             },
             title = { Text("Success") },
-            text = { Text("You have been registered successfully!") }
+            text = { Text("Account created successfully. Now you can sign in.") }
         )
     }
 
@@ -156,15 +156,21 @@ fun RegisterScreen(
 
                     AuthField(
                         value = nickname,
-                        onValueChange = { nickname = it },
-                        label = "Name/nickname"
+                        onValueChange = {
+                            nickname = it
+                            localError = null
+                        },
+                        label = "Username / nickname"
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
 
                     AuthField(
                         value = email,
-                        onValueChange = { email = it },
+                        onValueChange = {
+                            email = it
+                            localError = null
+                        },
                         label = "Email"
                     )
 
@@ -172,7 +178,10 @@ fun RegisterScreen(
 
                     AuthField(
                         value = password,
-                        onValueChange = { password = it },
+                        onValueChange = {
+                            password = it
+                            localError = null
+                        },
                         label = "Password",
                         isPassword = true
                     )
@@ -191,19 +200,24 @@ fun RegisterScreen(
 
                     Button(
                         onClick = {
+                            val trimmedNickname = nickname.trim()
+                            val trimmedEmail = email.trim()
+                            val trimmedPassword = password.trim()
+
                             localError = when {
-                                nickname.isBlank() -> "Nickname is required"
-                                email.isBlank() -> "Email is required"
-                                password.isBlank() -> "Password is required"
-                                password.length < 6 -> "Password must be at least 6 characters"
+                                trimmedNickname.isBlank() -> "Username is required"
+                                trimmedNickname.length < 3 -> "Username must be at least 3 characters"
+                                trimmedEmail.isBlank() -> "Email is required"
+                                trimmedPassword.isBlank() -> "Password is required"
+                                trimmedPassword.length < 6 -> "Password must be at least 6 characters"
                                 else -> null
                             }
 
                             if (localError == null) {
                                 authViewModel.registerUser(
-                                    email = email.trim(),
-                                    password = password.trim(),
-                                    nickname = nickname.trim()
+                                    email = trimmedEmail,
+                                    password = trimmedPassword,
+                                    nickname = trimmedNickname
                                 )
                             }
                         },
@@ -249,7 +263,11 @@ fun AuthField(
             )
         },
         singleLine = true,
-        visualTransformation = if (isPassword) PasswordVisualTransformation() else androidx.compose.ui.text.input.VisualTransformation.None,
+        visualTransformation = if (isPassword) {
+            PasswordVisualTransformation()
+        } else {
+            androidx.compose.ui.text.input.VisualTransformation.None
+        },
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
         colors = OutlinedTextFieldDefaults.colors(
