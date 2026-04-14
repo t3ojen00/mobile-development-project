@@ -5,9 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
@@ -23,14 +20,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.mobile_development_project.ui.components.reusable.FollowingContent
-import com.example.mobile_development_project.ui.components.reusable.UserLocationContent
 import com.example.mobile_development_project.ui.theme.Burgundy
-import com.example.mobile_development_project.ui.theme.ScreenBackground
-
 import com.example.mobile_development_project.viewModels.AdminViewModel
-import androidx.compose.foundation.lazy.items
-import com.example.mobile_development_project.ui.components.reusable.PendingLocations
+import com.example.mobile_development_project.ui.components.admin_view.PendingLocations
+import com.example.mobile_development_project.ui.components.admin_view.RejectedLocations
+import com.example.mobile_development_project.ui.components.admin_view.UsersList
 
 
 @Composable
@@ -42,24 +36,22 @@ fun AdminScreen(
     LaunchedEffect(Unit) {
         viewModel.fetchPendingLocations()
         viewModel.fetchAllUsers()
+        viewModel.fetchRejectedLocations()
     }
     var selectedTab by remember { mutableStateOf(0) }
 
-
-
     if (role == "admin") {
-        Column() {
-            HorizontalDivider(color = Color.Gray)
-
+        Column(modifier = Modifier.fillMaxSize())
+        {
             PrimaryTabRow(
                 selectedTabIndex = selectedTab,
-                containerColor = ScreenBackground,
+                containerColor = Color.White,
                 contentColor = Burgundy
             ) {
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    text = { Text("Pending locations") },
+                    text = { Text("Pending") },
                     selectedContentColor = Burgundy,
                     unselectedContentColor = Color.DarkGray
                 )
@@ -73,7 +65,7 @@ fun AdminScreen(
                 Tab(
                     selected = selectedTab == 2,
                     onClick = { selectedTab = 2 },
-                    text = { Text("Rejected locations") },
+                    text = { Text("Rejected") },
                     selectedContentColor = Burgundy,
                     unselectedContentColor = Color.DarkGray
                 )
@@ -81,7 +73,7 @@ fun AdminScreen(
 
             HorizontalDivider(color = Color.Gray)
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             when (selectedTab) {
                 0 -> PendingLocations(
@@ -89,59 +81,32 @@ fun AdminScreen(
                     navController,
                 )
 
-                1 -> DisplayUsersCard(
+                1 -> UsersList(
+                    users = viewModel.allUsers,
                     viewModel = viewModel,
-                    navController = navController,
-                    onClick = { },
+                    onDelete = { user ->
+                        viewModel.deleteUser(user.id)
+                    },
+                    onPromote = { user, role ->
+                        viewModel.updateUserRole(user.id, role)
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
-                /*
+
                 2 -> RejectedLocations(
-                    modifier = Modifier.fillMaxWidth()
-                )*/
+                    viewModel,
+                    navController,
+                )
+                /*
+                3 -> Statistics()
+              */
             }
         }
     }
+    else if(role == "moderator"){
+        PendingLocations(viewModel, navController)
+    }
 }
-        /*Column() {
-                // Admin actions
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-
-                PendingLocations(viewModel, navController)
-
-            }*/
-
-        @Composable
-        fun DisplayUsersCard(
-            viewModel: AdminViewModel = viewModel(),
-            onClick: () -> Unit,
-            navController: NavHostController,
-            modifier: Modifier
-        ) {
-            val allUsers = viewModel.allUsers
-
-            LazyColumn(modifier = modifier.fillMaxSize()) {
-                items(allUsers) { user ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            Text("Name: ${user.username} (${user.role})")
-                            Text("Email: ${user.email}")
-                            Text("Created at: ${user.createdAt}")
-                            Text("Is active: ${user.isActive}")
-                        }
-                    }
-                }
-            }
-        }
-
 
 
 
