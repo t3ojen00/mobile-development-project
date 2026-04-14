@@ -222,16 +222,6 @@ fun PendingLocations(
 
                         PrimaryButton(
                             onClick = {
-                                viewModel.approveLocation(location.id)
-                                viewModel.fetchPendingLocations()
-                            }, // refresh list
-                            modifier = Modifier.weight(1f),
-                            label = "Approve"
-                        )
-                        Spacer(modifier = Modifier.weight(0.1f))
-
-                        PrimaryButton(
-                            onClick = {
                                 viewModel.rejectLocation(location.id)
                                 viewModel.fetchPendingLocations()
                             },
@@ -241,6 +231,17 @@ fun PendingLocations(
                                 contentColor = Color.White
                             ),
                             label = "Reject"
+                        )
+
+                        Spacer(modifier = Modifier.weight(0.1f))
+
+                        PrimaryButton(
+                            onClick = {
+                                viewModel.approveLocation(location.id)
+                                viewModel.fetchPendingLocations()
+                            }, // refresh list
+                            modifier = Modifier.weight(1f),
+                            label = "Approve"
                         )
                     }
                 }

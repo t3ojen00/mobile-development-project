@@ -130,12 +130,21 @@ fun UserCard(
             }
 
             if (user.createdAt?.isNotBlank() ?: false) {
-                Text("Created at: ${user.createdAt}")
+                Text(
+                    "Created at: ${user.createdAt}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
             if (user.updatedAt?.isNotBlank() ?: false) {
-                Text("Updated at: ${user.updatedAt}")
+                Text(
+                    "Updated at: ${user.updatedAt}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
-            Text("Is active: ${user.isActive}")
+            Text(
+                "Is active: ${user.isActive}",
+                style = MaterialTheme.typography.bodyMedium
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
 
