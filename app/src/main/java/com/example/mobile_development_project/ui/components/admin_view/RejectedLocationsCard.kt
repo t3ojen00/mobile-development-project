@@ -156,6 +156,25 @@ fun RejectedLocations(
                         },
                         style = MaterialTheme.typography.bodySmall
                     )
+                    if (!location.updatedAt.isNullOrBlank()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = buildAnnotatedString {
+                                append("Updated: ")
+
+                                withStyle(
+                                    SpanStyle(
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                ) {
+                                    append(location.updatedAt!!)
+                                }
+                            },
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(6.dp))
 
