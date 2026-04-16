@@ -2,7 +2,6 @@ package com.example.mobile_development_project.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -47,15 +46,7 @@ import com.example.mobile_development_project.ui.theme.OrangeAccent
 import com.example.mobile_development_project.ui.theme.ScreenBackground
 import com.example.mobile_development_project.viewModels.AuthViewModel
 import com.example.mobile_development_project.viewModels.ProfileViewModel
-import androidx.compose.material3.Tab
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import com.example.mobile_development_project.ui.components.reusable.FollowingContent
-import com.example.mobile_development_project.ui.components.reusable.UserImagesContent
-import com.example.mobile_development_project.ui.components.reusable.UserLocationContent
-import com.example.mobile_development_project.ui.theme.Logout
+import com.example.mobile_development_project.ui.theme.Attention
 
 @Composable
 fun UserProfileScreen(
@@ -117,9 +108,9 @@ fun UserProfileScreen(
                 onClick = {
                     authViewModel.logoutUser()
                 },
-                modifier = Modifier.height(40.dp),
+                modifier = Modifier.height(40.dp).width(110.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Logout,
+                    containerColor = Attention,
                     contentColor = Color.White
                 )
             )
