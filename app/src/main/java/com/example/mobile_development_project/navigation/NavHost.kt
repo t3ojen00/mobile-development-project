@@ -81,7 +81,10 @@ fun Navigation(
 
         composable(NavRoutes.EditLocation) { backStackEntry ->
             val locationId = backStackEntry.arguments?.getString("id")
-            EditLocationScreen(locationId)
+            EditLocationScreen(
+                navController = navController,
+                locationId = locationId
+            )
         }
 
         composable(NavRoutes.UserProfile) {
