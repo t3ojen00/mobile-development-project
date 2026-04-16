@@ -144,7 +144,8 @@ class AddLocationViewModel : ViewModel() {
                         "tags" to tags,
                         "latitude" to coordinates.first,
                         "longitude" to coordinates.second,
-                        "updatedAt" to updatedAtStr
+                        "updatedAt" to updatedAtStr,
+                        "status" to "pending"
                     )
                 )
                 .addOnSuccessListener {
@@ -179,6 +180,20 @@ class AddLocationViewModel : ViewModel() {
                     setError(ErrorCause.GENERAL_SAVE_FAIL, error)
             }
         }
+
+       /* fun deleteImageFromStorage(url: String) {
+            images = images - imageUrl
+            val ref = FirebaseStorage.getInstance()
+                .getReferenceFromUrl(imageUrl)
+
+            ref.delete()
+                .addOnSuccessListener {
+                    Log.d("VM", "Image deleted from storage")
+                }
+                .addOnFailureListener {
+                    setError(ErrorCause.GENERAL_SAVE_FAIL, it)
+                }
+        } */
 
         fun clearMessage() {
             uiMessage = null
