@@ -25,7 +25,8 @@ fun TextFieldComponent(
     maxCharacters: Int,
     maxLines: Int,
     modifier: Modifier = Modifier,
-    imeAction: ImeAction = ImeAction.Next
+    imeAction: ImeAction = ImeAction.Next,
+    trailingIcon: (@Composable (() -> Unit))? = null
 ) {
     OutlinedTextField(
         value = value,
@@ -44,6 +45,7 @@ fun TextFieldComponent(
         keyboardActions = KeyboardActions(
             onNext = { focusManager.moveFocus(FocusDirection.Down) }
         ),
+        trailingIcon = trailingIcon,
         shape = RoundedCornerShape(12.dp),
         modifier = modifier,
         colors = TextFieldDefaults.colors(
