@@ -10,7 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,12 +28,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.mobile_development_project.ui.components.reusable.CardFormComponent
 import com.example.mobile_development_project.ui.components.reusable.PrimaryButton
 import com.example.mobile_development_project.viewModels.AddLocationViewModel
 import com.example.mobile_development_project.data.models.MsgType
-import com.example.mobile_development_project.ui.components.reusable.Overlay
+import com.example.mobile_development_project.ui.theme.OrangeAccent
 import com.example.mobile_development_project.ui.theme.errorMsg
 import com.example.mobile_development_project.ui.theme.successMsg
 
@@ -43,13 +45,13 @@ fun AddLocationScreen(
 ) {
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
-    var showOverlay by remember { mutableStateOf(false) }
+    var showSuccess by remember { mutableStateOf(false) }
 
         // scrollable column
         Column(
             modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 10.dp)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
                 .verticalScroll(scrollState)
                 // close keyboard when clicked outside
                 .clickable(
@@ -61,14 +63,12 @@ fun AddLocationScreen(
         ) {
             CardFormComponent(viewModel = viewModel, navController = navController)
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-
-            // display error/success messages
             viewModel.uiMessage?.let { (message, type) ->
                 Text(
                     text = message,
-                    fontWeight = FontWeight.Bold,
+                    //fontWeight = FontWeight.Bold,
                     color = if (type == MsgType.ERROR) errorMsg else successMsg,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
@@ -88,19 +88,45 @@ fun AddLocationScreen(
                 fontWeight = FontWeight.Bold,
                 onClick = {
                         viewModel.saveLocation {
-                            showOverlay = true
+                            showSuccess = true
                         }
                     },
                 modifier = Modifier.fillMaxWidth()
             )
         }
 
-            if (showOverlay) {
-                Overlay(
-                    message = "Your location has been saved and will be added on the map shortly!",
-                    onDismiss = {
-                        showOverlay = false
+            if (showSuccess) {
+                AlertDialog(
+                    modifier = Modifier.padding(16.dp),
+                    onDismissRequest = {
+                        showSuccess = false
                         viewModel.clearForm()
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                showSuccess = false
+                                viewModel.clearForm()
+                            }
+                        ) {
+                            Text(
+                                "OK",
+                                fontWeight = FontWeight.Bold,
+                                color = successMsg
+                            )
+                        }
+                    },
+                    title = { Text("Success") },
+                    text = {
+                        Column {
+                            Text("Your location has been saved and will be added on the map shortly!")
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                "Note that moderator can reject or request edits",
+                                color = OrangeAccent,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                     }
                 )
             }

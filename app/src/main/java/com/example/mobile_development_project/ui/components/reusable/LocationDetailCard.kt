@@ -71,7 +71,7 @@ fun LocationDetailCard(
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Added ${formatTimestamp(location.createdAt?.toLongOrNull())}",
+            text = "Added ${location.createdAt?.substringBefore(" ")}",
             style = MaterialTheme.typography.bodySmall,
             color = Color.Black
         )

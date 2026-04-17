@@ -76,8 +76,8 @@ class LocationDetailViewModel : ViewModel() {
                         ?: 0.0,
                     previewImageUrl = document.getString("previewImageUrl") ?: "",
                     status = document.getString("status") ?: "pending",
-                    createdAt = document.getString("createdAt") ?: "",
-                    updatedAt = document.getLong("updatedAt")?.toString(),
+                    createdAt = document.getString("createdAt")?: "",
+                    updatedAt = document.getString("updatedAt")?: "",
                     favoritesCount = document.getLong("favoritesCount")?.toInt() ?: 0
                 )
 

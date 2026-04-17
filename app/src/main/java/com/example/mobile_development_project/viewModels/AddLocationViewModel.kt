@@ -31,9 +31,9 @@ class AddLocationViewModel : ViewModel() {
         private set
     var selectedLocation by mutableStateOf<Pair<Double, Double>?>(null)
         private set
-
-    // ui messages
     var uiMessage by mutableStateOf<Triple<String, MsgType, ErrorCause?>?>(null)
+        private set
+    var editingLocationId: String? = null
         private set
 
     // setters for variables above
@@ -89,73 +89,156 @@ class AddLocationViewModel : ViewModel() {
             return
         }
 
-            val currentUser = FirebaseAuth.getInstance().currentUser
-            if (currentUser == null) {
-                setError(ErrorCause.USER_ERROR)
-                return
-            }
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser == null) {
+            setError(ErrorCause.USER_ERROR)
+            return
+        }
 
-            val userId = currentUser.uid
-            val username = currentUser.displayName ?: currentUser.email ?: "Unknown"
+        val userId = currentUser.uid
+        val username = currentUser.displayName ?: currentUser.email ?: "Unknown"
 
-            val formatter = SimpleDateFormat(
-                "dd.MM.yyyy HH:mm", Locale("fi", "FI")
-            )
-            val createdAtStr = formatter.format(java.util.Date())
+        val formatter = SimpleDateFormat(
+            "dd.MM.yyyy HH:mm", Locale("fi", "FI")
+        )
+        val createdAtStr = formatter.format(java.util.Date())
+        val updatedAtStr = formatter.format(java.util.Date())
 
-            val location = Location(
-                ownerId = userId,
-                ownerUsername = username,
-                status = "pending",
-                name = locationName,
-                description = description,
-                tags = tags,
-                latitude = coordinates.first,
-                longitude = coordinates.second,
-                createdAt = createdAtStr,
-            )
+        val location = Location(
+            ownerId = userId,
+            ownerUsername = username,
+            status = "pending",
+            name = locationName,
+            description = description,
+            tags = tags,
+            latitude = coordinates.first,
+            longitude = coordinates.second,
+            createdAt = createdAtStr,
+            updatedAt = if (editingLocationId == null) null else updatedAtStr
+        )
 
-            uiMessage = Triple("Saving location...", MsgType.LOADING, null)
+        uiMessage = Triple("Saving location...", MsgType.LOADING, null)
 
+        if (editingLocationId == null) {
             db.collection("locations")
                 .add(location)
                 .addOnSuccessListener {
                     uiMessage = Triple(
                         "",
                         MsgType.SUCCESS,
-                        null )
+                        null
+                    )
                     println("Saved successfully")
                     onSuccess()
                 }
                 .addOnFailureListener { e ->
                     setError(ErrorCause.GENERAL_SAVE_FAIL, e)
                 }
-    }
-    // clear message from ui display
-    fun clearMessage() {
-        uiMessage = null
-    }
-
-    // logic for tags, tag can be added only once per location and can't be empty
-    fun addTag(tag: String) {
-        if (tag.isNotBlank() && !tags.contains(tag)) {
-            tags = tags + tag
         } else {
-            if (tags.contains(tag)) {
-                setError(ErrorCause.TAG_EXISTS)
-            } else {
-                setError(ErrorCause.BLANK_FIELDS)
+            db.collection("locations")
+                .document(editingLocationId!!)
+                .update(
+                    mapOf(
+                        "name" to locationName,
+                        "description" to description,
+                        "tags" to tags,
+                        "latitude" to coordinates.first,
+                        "longitude" to coordinates.second,
+                        "updatedAt" to updatedAtStr,
+                        "status" to "pending"
+                    )
+                )
+                .addOnSuccessListener {
+                    uiMessage = Triple(
+                        "Edits saved successfully!",
+                        MsgType.SUCCESS,
+                        null
+                    )
+                    println("Edit saved successfully")
+                    onSuccess()
+                }
+                .addOnFailureListener { e ->
+                    setError(ErrorCause.GENERAL_SAVE_FAIL, e)
+                }
             }
         }
-    }
-    fun removeTag(tag: String) {
-        tags = tags - tag
-    }
 
-    fun clearForm() {
-        locationName = ""
-        description = ""
-        tags = listOf()
-        gpsCoordinates = null
-    }
+        fun deleteLocation(onSuccess: () -> Unit) {
+            db.collection("locations")
+                .document(editingLocationId!!)
+                .delete()
+                .addOnSuccessListener {
+                    uiMessage = Triple(
+                        "Location deleted successfully!",
+                        MsgType.SUCCESS,
+                        null
+                    )
+                    println("Location deleted successfully")
+                    onSuccess()
+                }
+                .addOnFailureListener { error ->
+                    setError(ErrorCause.GENERAL_SAVE_FAIL, error)
+            }
+        }
+
+       /* fun deleteImageFromStorage(url: String) {
+            images = images - imageUrl
+            val ref = FirebaseStorage.getInstance()
+                .getReferenceFromUrl(imageUrl)
+
+            ref.delete()
+                .addOnSuccessListener {
+                    Log.d("VM", "Image deleted from storage")
+                }
+                .addOnFailureListener {
+                    setError(ErrorCause.GENERAL_SAVE_FAIL, it)
+                }
+        } */
+
+        fun clearMessage() {
+            uiMessage = null
+        }
+
+        // logic for tags, tag can be added only once per location and can't be empty
+        fun addTag(tag: String) {
+            if (tag.isNotBlank() && !tags.contains(tag)) {
+                tags = tags + tag
+            } else {
+                if (tags.contains(tag)) {
+                    setError(ErrorCause.TAG_EXISTS)
+                } else {
+                    setError(ErrorCause.BLANK_FIELDS)
+                }
+            }
+        }
+        fun removeTag(tag: String) {
+            tags = tags - tag
+        }
+
+        fun clearForm() {
+            locationName = ""
+            description = ""
+            tags = listOf()
+            gpsCoordinates = null
+        }
+
+        fun loadLocationForEdit(locationId: String) {
+            editingLocationId = locationId
+
+            db.collection("locations")
+                .document(locationId)
+                .get()
+                .addOnSuccessListener { doc ->
+                    val location = doc.toObject(Location::class.java) ?: return@addOnSuccessListener
+
+                    locationName = location.name
+                    description = location.description
+                    tags = location.tags
+                    gpsCoordinates = Pair(location.latitude, location.longitude)
+                    // also images
+                }
+                .addOnFailureListener { error ->
+                    setError(ErrorCause.GENERAL_FETCH_FAIL, error)
+                }
+        }
 }

@@ -61,12 +61,14 @@ class AdminViewModel : ViewModel() {
                             previewImageUrl = doc.getString("previewImageUrl") ?: "",
                             status = doc.getString("status") ?: "pending",
                             createdAt = doc.getString("createdAt") ?: "",
-                            updatedAt = doc.getLong("updatedAt")?.toString() ?: "",
+                            updatedAt = doc.getString("updatedAt") ?: "",
                             favoritesCount = doc.getLong("favoritesCount")?.toInt() ?: 0
                             )
                     }
                     .sortedBy { location ->
-                        LocalDateTime.parse(location.createdAt, formatter)
+                        runCatching {
+                            LocalDateTime.parse(location.createdAt, formatter)
+                        }.getOrNull()
                     }
             }
             .addOnFailureListener { exception ->
@@ -158,6 +160,7 @@ class AdminViewModel : ViewModel() {
                             previewImageUrl = doc.getString("previewImageUrl") ?: "",
                             status = doc.getString("status") ?: "pending",
                             createdAt = doc.getString("createdAt") ?: "",
+                            updatedAt = doc.get("updatedAt") as? String ?: "",
                         )
                     }
                     .sortedBy { location ->

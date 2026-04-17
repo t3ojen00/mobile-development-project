@@ -31,7 +31,7 @@ class MapViewModel : ViewModel() {
                         previewImageUrl = it.getString("previewImageUrl") ?: "",
                         status = it.getString("status") ?: "approved",
                         createdAt = it.getString("createdAt") ?: "",
-                        updatedAt = it.getLong("updatedAt")?.toString() ?: "",
+                        updatedAt = it.getString("updatedAt") ?: "",
                         favoritesCount = it.getLong("favoritesCount")?.toInt() ?: 0
                     )
                 }

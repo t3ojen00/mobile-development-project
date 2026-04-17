@@ -45,6 +45,7 @@ import com.example.mobile_development_project.ui.theme.OrangeAccent
 import com.example.mobile_development_project.ui.theme.ScreenBackground
 import com.example.mobile_development_project.viewModels.AuthViewModel
 import com.example.mobile_development_project.viewModels.ProfileViewModel
+import com.example.mobile_development_project.ui.theme.Attention
 
 @Composable
 fun UserProfileScreen(
@@ -105,17 +106,15 @@ fun UserProfileScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            if (isOwnProfile) {
-                PrimaryButton(
-                    label = "Log out",
-                    onClick = {
-                        authViewModel.logoutUser()
-                    },
-                    modifier = Modifier.height(40.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Logout,
-                        contentColor = Color.White
-                    )
+            PrimaryButton(
+                label = "Log out",
+                onClick = {
+                    authViewModel.logoutUser()
+                },
+                modifier = Modifier.height(40.dp).width(110.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Attention,
+                    contentColor = Color.White
                 )
             }
         }
