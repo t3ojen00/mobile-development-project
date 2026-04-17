@@ -47,6 +47,7 @@ fun Navigation(
                 }
             )
         }
+
         composable(NavRoutes.Register) {
             RegisterScreen(
                 onBackClick = {
@@ -121,7 +122,7 @@ fun Navigation(
         }
 
         composable(NavRoutes.Search) {
-            SearchLocationScreen()
+            SearchLocationScreen(navController = navController)
         }
     }
 }

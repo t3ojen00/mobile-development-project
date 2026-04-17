@@ -14,7 +14,9 @@ data class LocationDetailUiState(
     val location: Location? = null,
     val errorMessage: String? = null,
     val isOwner: Boolean = false,
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val isFollowingOwner: Boolean = false,
+    val isFollowLoading: Boolean = false
 )
 
 class LocationDetailViewModel : ViewModel() {
@@ -52,7 +54,9 @@ class LocationDetailViewModel : ViewModel() {
                         isLoading = false,
                         location = null,
                         errorMessage = "Location not found",
-                        isOwner = false
+                        isOwner = false,
+                        isFavorite = false,
+                        isFollowingOwner = false
                     )
                     return@addOnSuccessListener
                 }
@@ -72,14 +76,12 @@ class LocationDetailViewModel : ViewModel() {
                         ?: 0.0,
                     previewImageUrl = document.getString("previewImageUrl") ?: "",
                     status = document.getString("status") ?: "pending",
-                    createdAt = document.getString("createdAt")?: "",
+                    createdAt = document.getString("createdAt") ?: "",
                     updatedAt = document.getLong("updatedAt")?.toString(),
                     favoritesCount = document.getLong("favoritesCount")?.toInt() ?: 0
                 )
 
                 val isOwner = currentUserId == loadedLocation.ownerId
-                val currentUserId = auth.currentUser?.uid
-
 
                 if (currentUserId == null) {
                     uiState = uiState.copy(
@@ -87,7 +89,8 @@ class LocationDetailViewModel : ViewModel() {
                         location = loadedLocation,
                         errorMessage = null,
                         isOwner = isOwner,
-                        isFavorite = false
+                        isFavorite = false,
+                        isFollowingOwner = false
                     )
                     return@addOnSuccessListener
                 }
@@ -98,13 +101,45 @@ class LocationDetailViewModel : ViewModel() {
                     .document(locationId)
                     .get()
                     .addOnSuccessListener { favoriteDoc ->
-                        uiState = uiState.copy(
-                            isLoading = false,
-                            location = loadedLocation,
-                            errorMessage = null,
-                            isOwner = isOwner,
-                            isFavorite = favoriteDoc.exists()
-                        )
+                        val isFavorite = favoriteDoc.exists()
+
+                        if (isOwner || loadedLocation.ownerId.isBlank()) {
+                            uiState = uiState.copy(
+                                isLoading = false,
+                                location = loadedLocation,
+                                errorMessage = null,
+                                isOwner = isOwner,
+                                isFavorite = isFavorite,
+                                isFollowingOwner = false
+                            )
+                            return@addOnSuccessListener
+                        }
+
+                        db.collection("follows")
+                            .whereEqualTo("followerId", currentUserId)
+                            .whereEqualTo("followingId", loadedLocation.ownerId)
+                            .limit(1)
+                            .get()
+                            .addOnSuccessListener { followDocs ->
+                                uiState = uiState.copy(
+                                    isLoading = false,
+                                    location = loadedLocation,
+                                    errorMessage = null,
+                                    isOwner = isOwner,
+                                    isFavorite = isFavorite,
+                                    isFollowingOwner = !followDocs.isEmpty
+                                )
+                            }
+                            .addOnFailureListener {
+                                uiState = uiState.copy(
+                                    isLoading = false,
+                                    location = loadedLocation,
+                                    errorMessage = null,
+                                    isOwner = isOwner,
+                                    isFavorite = isFavorite,
+                                    isFollowingOwner = false
+                                )
+                            }
                     }
                     .addOnFailureListener {
                         uiState = uiState.copy(
@@ -112,7 +147,8 @@ class LocationDetailViewModel : ViewModel() {
                             location = loadedLocation,
                             errorMessage = null,
                             isOwner = isOwner,
-                            isFavorite = false
+                            isFavorite = false,
+                            isFollowingOwner = false
                         )
                     }
             }
@@ -121,7 +157,9 @@ class LocationDetailViewModel : ViewModel() {
                     isLoading = false,
                     location = null,
                     errorMessage = e.message ?: "Failed to load location",
-                    isOwner = false
+                    isOwner = false,
+                    isFavorite = false,
+                    isFollowingOwner = false
                 )
             }
     }
@@ -137,7 +175,6 @@ class LocationDetailViewModel : ViewModel() {
             .document(locationId)
 
         val locationRef = db.collection("locations").document(locationId)
-
         val currentlyFavorite = uiState.isFavorite
 
         if (currentlyFavorite) {
@@ -172,5 +209,87 @@ class LocationDetailViewModel : ViewModel() {
                     )
                 }
         }
+    }
+
+    fun toggleFollowOwner() {
+        val currentUserId = auth.currentUser?.uid ?: return
+        val location = uiState.location ?: return
+        val ownerId = location.ownerId
+
+        if (ownerId.isBlank() || ownerId == currentUserId) return
+        if (uiState.isFollowLoading) return
+
+        uiState = uiState.copy(isFollowLoading = true)
+
+        db.collection("follows")
+            .whereEqualTo("followerId", currentUserId)
+            .whereEqualTo("followingId", ownerId)
+            .limit(1)
+            .get()
+            .addOnSuccessListener { existingDocs ->
+                if (!existingDocs.isEmpty) {
+                    val docId = existingDocs.documents.first().id
+                    db.collection("follows")
+                        .document(docId)
+                        .delete()
+                        .addOnSuccessListener {
+                            uiState = uiState.copy(
+                                isFollowingOwner = false,
+                                isFollowLoading = false
+                            )
+                        }
+                        .addOnFailureListener { error ->
+                            uiState = uiState.copy(
+                                isFollowLoading = false,
+                                errorMessage = error.message ?: "Failed to unfollow user"
+                            )
+                        }
+                } else {
+                    db.collection("users")
+                        .document(ownerId)
+                        .get()
+                        .addOnSuccessListener { ownerDoc ->
+                            val ownerUsername = ownerDoc.getString("username") ?: ""
+                            val ownerDisplayName = ownerDoc.getString("displayName") ?: ownerUsername
+                            val ownerEmail = ownerDoc.getString("email") ?: ""
+
+                            val followData = hashMapOf(
+                                "followerId" to currentUserId,
+                                "followingId" to ownerId,
+                                "followingUsername" to ownerUsername,
+                                "followingDisplayName" to ownerDisplayName,
+                                "followingEmail" to ownerEmail,
+                                "createdAt" to FieldValue.serverTimestamp()
+                            )
+
+                            db.collection("follows")
+                                .add(followData)
+                                .addOnSuccessListener {
+                                    uiState = uiState.copy(
+                                        isFollowingOwner = true,
+                                        isFollowLoading = false
+                                    )
+                                }
+                                .addOnFailureListener { error ->
+                                    uiState = uiState.copy(
+                                        isFollowLoading = false,
+                                        errorMessage = error.message ?: "Failed to follow user"
+                                    )
+                                }
+                        }
+                        .addOnFailureListener { error ->
+                            uiState = uiState.copy(
+                                isFollowLoading = false,
+                                errorMessage = error.message ?: "Failed to load user data"
+                            )
+                        }
+                }
+            }
+            .addOnFailureListener { error ->
+                uiState = uiState.copy(
+                    isFollowLoading = false,
+                    errorMessage = error.message ?: "Failed to check follow status"
+                )
+            }
     }
 }

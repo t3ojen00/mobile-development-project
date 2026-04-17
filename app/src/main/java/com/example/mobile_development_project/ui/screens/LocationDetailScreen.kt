@@ -50,7 +50,7 @@ fun LocationDetailScreen(
             }
         }
 
-        state.errorMessage != null -> {
+        state.errorMessage != null && state.location == null -> {
             Box(
                 modifier = modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -65,6 +65,11 @@ fun LocationDetailScreen(
                 isOwner = state.isOwner,
                 isFavorite = state.isFavorite,
                 onFavoriteClick = { viewModel.toggleFavorite() },
+                onViewProfileClick = {
+                    navController.navigate(
+                        NavRoutes.UserProfileWithId.replace("{id}", state.location.ownerId)
+                    )
+                },
                 onEditClick = {
                     navController.navigate(
                         NavRoutes.EditLocation.replace("{id}", state.location.id)
@@ -108,6 +113,7 @@ fun LocationDetailCardPreview() {
         isOwner = true,
         isFavorite = false,
         onFavoriteClick = {},
+        onViewProfileClick = {},
         onEditClick = {}
     )
 }
