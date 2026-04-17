@@ -89,9 +89,9 @@ fun CardFormComponent(
 
                 client.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationToken)
                     .addOnSuccessListener { location ->
-                        Log.d("GPS", "SOURCE LAT=${location.latitude}, LNG=${location.longitude}")
                         isLoading = false
                         if (location != null) {
+                            Log.d("GPS", "SOURCE LAT=${location.latitude}, LNG=${location.longitude}")
                             viewModel.setGpsCoordinates(location.latitude, location.longitude)
                         } else {
                             // call works technically but location is null

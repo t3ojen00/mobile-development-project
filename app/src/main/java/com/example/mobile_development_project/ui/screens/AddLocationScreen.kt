@@ -28,12 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.mobile_development_project.ui.components.reusable.CardFormComponent
 import com.example.mobile_development_project.ui.components.reusable.PrimaryButton
 import com.example.mobile_development_project.viewModels.AddLocationViewModel
 import com.example.mobile_development_project.data.models.MsgType
-import com.example.mobile_development_project.ui.components.reusable.Overlay
 import com.example.mobile_development_project.ui.theme.OrangeAccent
 import com.example.mobile_development_project.ui.theme.errorMsg
 import com.example.mobile_development_project.ui.theme.successMsg
@@ -99,6 +97,7 @@ fun AddLocationScreen(
 
             if (showSuccess) {
                 AlertDialog(
+                    modifier = Modifier.padding(16.dp),
                     onDismissRequest = {
                         showSuccess = false
                         viewModel.clearForm()
