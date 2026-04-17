@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -45,6 +44,7 @@ fun LocationDetailCard(
     isOwner: Boolean,
     isFavorite: Boolean,
     onFavoriteClick: () -> Unit,
+    onViewProfileClick: () -> Unit,
     onEditClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -121,8 +121,6 @@ fun LocationDetailCard(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
                 if (location.tags.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -160,6 +158,19 @@ fun LocationDetailCard(
                             tint = Burgundy
                         )
                     }
+                }
+
+                if (!isOwner && location.ownerId.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    PrimaryButton(
+                        label = "View profile",
+                        onClick = onViewProfileClick,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Burgundy,
+                            contentColor = Color.White
+                        )
+                    )
                 }
             }
         }

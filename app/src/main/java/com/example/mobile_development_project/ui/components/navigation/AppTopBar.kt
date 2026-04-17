@@ -39,7 +39,7 @@ fun TopBar(
         currentRoute == NavRoutes.AddLocation -> "Add location"
         currentRoute == NavRoutes.Favorites -> "Favorites"
         currentRoute == NavRoutes.Admin -> if (role == "moderator") "Moderator" else "Admin"
-        currentRoute == NavRoutes.Search -> "Search location"
+        currentRoute == NavRoutes.Search -> "Search Users"
         currentRoute == NavRoutes.SelectFromMap -> "Select location"
         currentRoute == NavRoutes.UserProfile -> "Profile"
         currentRoute?.startsWith("location/") == true -> "Location details"
