@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -40,7 +41,6 @@ import com.example.mobile_development_project.ui.components.reusable.FollowingCo
 import com.example.mobile_development_project.ui.components.reusable.PrimaryButton
 import com.example.mobile_development_project.ui.components.reusable.UserImagesContent
 import com.example.mobile_development_project.ui.components.reusable.UserLocationContent
-import com.example.mobile_development_project.ui.theme.Logout
 import com.example.mobile_development_project.ui.theme.OrangeAccent
 import com.example.mobile_development_project.ui.theme.ScreenBackground
 import com.example.mobile_development_project.viewModels.AuthViewModel
@@ -106,17 +106,19 @@ fun UserProfileScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            PrimaryButton(
-                label = "Log out",
-                onClick = {
-                    authViewModel.logoutUser()
-                },
-                modifier = Modifier.height(40.dp).width(110.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Attention,
-                    contentColor = Color.White
+            if (isOwnProfile) {
+                PrimaryButton(
+                    label = "Log out",
+                    onClick = {
+                        authViewModel.logoutUser()
+                    },
+                    modifier = Modifier.height(40.dp).width(110.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Attention,
+                        contentColor = Color.White )
                 )
             }
+
         }
 
         Spacer(modifier = Modifier.height(8.dp))
