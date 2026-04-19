@@ -34,9 +34,6 @@ import com.example.mobile_development_project.data.models.Location
 import com.example.mobile_development_project.ui.theme.AuthCardGray
 import com.example.mobile_development_project.ui.theme.Burgundy
 import com.example.mobile_development_project.ui.theme.ScreenBackground
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Composable
 fun LocationDetailCard(
@@ -48,6 +45,14 @@ fun LocationDetailCard(
     onEditClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val savedImages = when {
+        location.imageUrls.isNotEmpty() -> location.imageUrls.take(3)
+        location.previewImageUrl.isNotBlank() -> listOf(location.previewImageUrl)
+        else -> emptyList()
+    }
+
+    val carouselItems: List<String?> = savedImages + List(3 - savedImages.size) { null }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -55,23 +60,15 @@ fun LocationDetailCard(
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            ImagePlaceholder(
-                modifier = Modifier.weight(1f)
-            )
-
-            ImagePlaceholder(
-                modifier = Modifier.weight(1f)
-            )
-        }
+        ImageCarousel(
+            items = carouselItems,
+            editMode = false
+        )
 
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Added ${location.createdAt?.substringBefore(" ")}",
+            text = "Added ${location.createdAt?.substringBefore(" ") ?: "Unknown date"}",
             style = MaterialTheme.typography.bodySmall,
             color = Color.Black
         )
@@ -188,10 +185,4 @@ fun LocationDetailCard(
             )
         }
     }
-}
-
-private fun formatTimestamp(timestamp: Long?): String {
-    if (timestamp == null) return "Unknown date"
-    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    return formatter.format(Date(timestamp))
 }

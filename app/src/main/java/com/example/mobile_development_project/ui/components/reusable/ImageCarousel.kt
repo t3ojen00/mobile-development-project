@@ -1,9 +1,9 @@
 package com.example.mobile_development_project.ui.components.reusable
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -27,19 +27,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.example.mobile_development_project.data.models.Image
+import coil.compose.AsyncImage
 import com.example.mobile_development_project.ui.theme.OrangeAccent
 
 // documentation from here: https://developer.android.com/develop/ui/compose/components/carousel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImageCarousel(
-    items: List<Image>,
-    onRemoveImage: () -> Unit,
-    onAddImage: () -> Unit,
+    items: List<String?>,
+    onRemoveImage: ((Int) -> Unit)? = null,
+    onAddImage: (() -> Unit)? = null,
     editMode: Boolean
 ) {
     val state = rememberCarouselState { items.size}
@@ -62,7 +63,7 @@ fun ImageCarousel(
 
         ) { index ->
 
-        val image = items[index]
+        val imageUrl = items[index]
 
         Box(
             modifier = Modifier
@@ -70,18 +71,19 @@ fun ImageCarousel(
                 .aspectRatio(1f)
         ) {
             // if image is null, show placeholder
-            if (image.localBitmap == null) {
-                ImagePlaceholder()
-            } else if (image.databaseUrl == null) {
-                // if image has been added, show that image
-                Image(
-                    bitmap = image.localBitmap,
+            if (imageUrl != null) {
+                AsyncImage(
+                    model = imageUrl,
                     contentDescription = null,
-                    modifier = roundedEdges
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
                 )
             } else {
-                // download from database, e.g. using AsyncImage() and Coil library
+                ImagePlaceholder(
+                    modifier = Modifier.fillMaxSize()
+                )
             }
+
             if (editMode) {
                 Box(modifier = Modifier.align(Alignment.TopEnd)) {
 
@@ -107,20 +109,22 @@ fun ImageCarousel(
                         offset = DpOffset((-40).dp, (-4).dp)
 
                     ) {
-                        DropdownMenuItem(
-                            text = { Text("Remove image") },
-                            onClick = {
-                                menuExpanded = null
-                                onRemoveImage()
-                            },
-
+                        if (imageUrl != null) {
+                            DropdownMenuItem(
+                                text = { Text("Remove image") },
+                                onClick = {
+                                    menuExpanded = null
+                                    onRemoveImage?.invoke(index)
+                                }
                             )
-
+                        }
                         DropdownMenuItem(
-                            text = { Text("Add new image") },
+                            text = {
+                                Text(if (imageUrl == null) "Add image" else "Replace image")
+                            },
                             onClick = {
                                 menuExpanded = null
-                                onAddImage()
+                                onAddImage?.invoke()
                             }
                         )
                     }
