@@ -10,6 +10,7 @@ data class Location(
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
     val previewImageUrl: String = "",
+    val imageUrls: List<String> = emptyList(),
     val status: String = "pending",
     val createdAt: String? = null, // date and time
     val updatedAt: String? = null,

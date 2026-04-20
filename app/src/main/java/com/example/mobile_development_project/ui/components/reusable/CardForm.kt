@@ -29,30 +29,56 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.platform.LocalContext
-import com.example.mobile_development_project.data.models.Image
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import android.Manifest
+import android.annotation.SuppressLint
 import android.util.Log
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.example.mobile_development_project.data.models.ErrorCause
 import com.example.mobile_development_project.navigation.NavRoutes
-
+import android.net.Uri
+import android.content.Context
+import androidx.core.content.FileProvider
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import com.example.mobile_development_project.ui.helpers.createImageUri
 enum class FormMode {
     ADD,
     EDIT
 }
 
+// "create" a picture by taking it with camera
+fun createImageUri(context: Context): Uri {
+    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+    val imageFile = File.createTempFile(
+        "JPEG_${timeStamp}_",
+        ".jpg",
+        File(context.cacheDir, "images").apply { mkdirs() }
+    )
+
+    return FileProvider.getUriForFile(
+        context,
+        "${context.packageName}.fileprovider",
+        imageFile
+    )
+}
+
+@SuppressLint("MissingPermission")
 @Composable
 fun CardFormComponent(
     viewModel: AddLocationViewModel,
@@ -67,6 +93,52 @@ fun CardFormComponent(
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
     var isLoading by remember { mutableStateOf(false) }
+
+    val images = remember { mutableStateListOf<String?>(null, null, null) }
+    var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
+    var imageMenuExpanded by remember { mutableStateOf(false) }
+
+    LaunchedEffect(viewModel.images) {
+        for (i in 0..2) {
+            images[i] = viewModel.images.getOrNull(i)
+        }
+    }
+    // gallery
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            val emptyIndex = images.indexOfFirst { it == null }
+            if (emptyIndex != -1) {
+                images[emptyIndex] = uri.toString()
+                viewModel.addImage(uri.toString())
+            }
+        }
+    }
+    // cmaera
+    val takePictureLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && cameraImageUri != null) {
+            val emptyIndex = images.indexOfFirst { it == null }
+            if (emptyIndex != -1) {
+                images[emptyIndex] = cameraImageUri.toString()
+                viewModel.addImage(cameraImageUri.toString())
+            }
+        }
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            val uri = createImageUri(context)
+            cameraImageUri = uri
+            takePictureLauncher.launch(uri)
+        } else {
+            viewModel.setError(ErrorCause.LOCATION_PERMISSION_DENIED)
+        }
+    }
 
     // listen and receive selected coordinates (lat, lng) from MapSelectionScreen and store in ViewModel
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
@@ -105,14 +177,6 @@ fun CardFormComponent(
                     }
       }
 
-    // list of images (uses Image model)
-    val initialImages = listOf(
-        Image(uri = null),
-        Image(uri = null),
-        Image(uri = null)
-    )
-    // mutable state list of images that updates when user adds own images
-    val images = remember { mutableStateListOf<Image>().apply { addAll(initialImages) } }
 
     Card(
         modifier = Modifier
@@ -132,11 +196,18 @@ fun CardFormComponent(
                 ImageCarousel(
                     items = images,
                     editMode = true,
-                    onRemoveImage = {},
-                    onAddImage = {}
+                    onRemoveImage = { index ->
+                        val uriToRemove = images[index]
+                        if (uriToRemove != null) {
+                            viewModel.removeImage(uriToRemove)
+                        }
+                        images[index] = null
+                    },
+                    onAddImage = null
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
+
 
             TextFieldComponent(
                 value = viewModel.locationName,
@@ -231,7 +302,7 @@ fun CardFormComponent(
             Spacer(modifier = Modifier.height(6.dp))
 
             Row( modifier = Modifier.fillMaxWidth()) {
-                if(mode == FormMode.ADD) {
+                if (mode == FormMode.ADD) {
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -267,37 +338,76 @@ fun CardFormComponent(
                     }
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    PrimaryButton(
-                        label = "Add images",
-                        onClick = { },
+                    Box(
                         modifier = Modifier.weight(1f)
-                    )
+                    ) {
+                        PrimaryButton(
+                            label = "Add images",
+                            onClick = { imageMenuExpanded = true },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        DropdownMenu(
+                            expanded = imageMenuExpanded,
+                            onDismissRequest = { imageMenuExpanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Choose from gallery") },
+                                onClick = {
+                                    imageMenuExpanded = false
+                                    if (images.count { it != null } < 3) {
+                                        photoPickerLauncher.launch(
+                                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                        )
+                                    }
+                                }
+                            )
+
+                            DropdownMenuItem(
+                                text = { Text("Take a picture") },
+                                onClick = {
+                                    imageMenuExpanded = false
+                                    if (images.count { it != null } < 3) {
+                                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                                    }
+                                }
+                            )
+                        }
+                    }
                 }
             }
-            if (isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp)
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = Color.White
-                    )
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp)
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center),
+                            color = Color.White
+                        )
+                    }
                 }
-            }
+                Spacer(modifier = Modifier.height(20.dp))
+
 
             if (mode == FormMode.ADD) {
                 Spacer(modifier = Modifier.height(20.dp))
                 ImageCarousel(
                     items = images,
-                    editMode = false,
-                    onRemoveImage = {},
-                    onAddImage = {}
+                    editMode = true,
+                    onRemoveImage = { index ->
+                        val uriToRemove = images[index]
+                        if (uriToRemove != null) {
+                            viewModel.removeImage(uriToRemove)
+                        }
+                        images[index] = null
+                    },
+                    onAddImage = null
                 )
             }
-            Spacer(modifier = Modifier.height(12.dp))
 
+            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }

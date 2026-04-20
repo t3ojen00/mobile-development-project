@@ -11,13 +11,17 @@ import com.example.mobile_development_project.data.models.Location
 import com.example.mobile_development_project.helpers.ErrorMapper
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import java.text.SimpleDateFormat
 import java.util.Locale
+import android.net.Uri
+import java.util.UUID
 
 
 class AddLocationViewModel : ViewModel() {
 
     val db = FirebaseFirestore.getInstance()
+    private val storage = FirebaseStorage.getInstance()
 
     var locationName by mutableStateOf("")
         private set
@@ -42,6 +46,17 @@ class AddLocationViewModel : ViewModel() {
     }
     fun onDescriptionChange(value: String) {
         description = value
+    }
+
+    // add and remove images
+    fun addImage(uri: String) {
+        if (images.size < 3 && !images.contains(uri)) {
+            images = images + uri
+        }
+    }
+
+    fun removeImage(uri: String) {
+        images = images - uri
     }
 
     fun formatCoordinates(value: Double): String {
@@ -75,6 +90,56 @@ class AddLocationViewModel : ViewModel() {
         )
     }
 
+    private fun uploadImages(
+        userId: String,
+        onSuccess: (List<String>) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        if (images.isEmpty()) {
+            onSuccess(emptyList())
+            return
+        }
+
+        val uploadedUrls = mutableListOf<String>()
+        var completedCount = 0
+        var hasFailed = false
+
+        images.forEach { imageString ->
+            val localUri = Uri.parse(imageString)
+
+            val fileName = "${UUID.randomUUID()}.jpg"
+            val imageRef = storage.reference
+                .child("location_images")
+                .child(userId)
+                .child(fileName)
+
+            imageRef.putFile(localUri)
+                .addOnSuccessListener {
+                    imageRef.downloadUrl
+                        .addOnSuccessListener { downloadUri ->
+                            if (hasFailed) return@addOnSuccessListener
+
+                            uploadedUrls.add(downloadUri.toString())
+                            completedCount++
+
+                            if (completedCount == images.size) {
+                                onSuccess(uploadedUrls)
+                            }
+                        }
+                        .addOnFailureListener { e ->
+                            if (hasFailed) return@addOnFailureListener
+                            hasFailed = true
+                            onFailure(e)
+                        }
+                }
+                .addOnFailureListener { e ->
+                    if (hasFailed) return@addOnFailureListener
+                    hasFailed = true
+                    onFailure(e)
+                }
+        }
+    }
+
     // method to save location to firebase
     fun saveLocation(onSuccess: () -> Unit) {
         // validate fields not being empty
@@ -104,64 +169,79 @@ class AddLocationViewModel : ViewModel() {
         val createdAtStr = formatter.format(java.util.Date())
         val updatedAtStr = formatter.format(java.util.Date())
 
-        val location = Location(
-            ownerId = userId,
-            ownerUsername = username,
-            status = "pending",
-            name = locationName,
-            description = description,
-            tags = tags,
-            latitude = coordinates.first,
-            longitude = coordinates.second,
-            createdAt = createdAtStr,
-            updatedAt = if (editingLocationId == null) null else updatedAtStr
-        )
+        uiMessage = Triple("Uploading images...", MsgType.LOADING, null)
 
-        uiMessage = Triple("Saving location...", MsgType.LOADING, null)
+        uploadImages(
+            userId = userId,
+            onSuccess = { uploadedImageUrls ->
 
-        if (editingLocationId == null) {
-            db.collection("locations")
-                .add(location)
-                .addOnSuccessListener {
-                    uiMessage = Triple(
-                        "",
-                        MsgType.SUCCESS,
-                        null
-                    )
-                    println("Saved successfully")
-                    onSuccess()
-                }
-                .addOnFailureListener { e ->
-                    setError(ErrorCause.GENERAL_SAVE_FAIL, e)
-                }
-        } else {
-            db.collection("locations")
-                .document(editingLocationId!!)
-                .update(
-                    mapOf(
-                        "name" to locationName,
-                        "description" to description,
-                        "tags" to tags,
-                        "latitude" to coordinates.first,
-                        "longitude" to coordinates.second,
-                        "updatedAt" to updatedAtStr,
-                        "status" to "pending"
-                    )
+                val location = Location(
+                    ownerId = userId,
+                    ownerUsername = username,
+                    status = "pending",
+                    name = locationName,
+                    description = description,
+                    tags = tags,
+                    latitude = coordinates.first,
+                    longitude = coordinates.second,
+                    previewImageUrl = uploadedImageUrls.firstOrNull() ?: "",
+                    imageUrls = uploadedImageUrls,
+                    createdAt = createdAtStr,
+                    updatedAt = if (editingLocationId == null) null else updatedAtStr
                 )
-                .addOnSuccessListener {
-                    uiMessage = Triple(
-                        "Edits saved successfully!",
-                        MsgType.SUCCESS,
-                        null
-                    )
-                    println("Edit saved successfully")
-                    onSuccess()
+
+                uiMessage = Triple("Saving location...", MsgType.LOADING, null)
+
+                if (editingLocationId == null) {
+                    db.collection("locations")
+                        .add(location)
+                        .addOnSuccessListener {
+                            uiMessage = Triple(
+                                "",
+                                MsgType.SUCCESS,
+                                null
+                            )
+                            println("Saved successfully")
+                            onSuccess()
+                        }
+                        .addOnFailureListener { e ->
+                            setError(ErrorCause.GENERAL_SAVE_FAIL, e)
+                        }
+                } else {
+                    db.collection("locations")
+                        .document(editingLocationId!!)
+                        .update(
+                            mapOf(
+                                "name" to locationName,
+                                "description" to description,
+                                "tags" to tags,
+                                "latitude" to coordinates.first,
+                                "longitude" to coordinates.second,
+                                "imageUrls" to uploadedImageUrls,
+                                "previewImageUrl" to (uploadedImageUrls.firstOrNull() ?: ""),
+                                "updatedAt" to updatedAtStr,
+                                "status" to "pending"
+                            )
+                        )
+                        .addOnSuccessListener {
+                            uiMessage = Triple(
+                                "Edits saved successfully!",
+                                MsgType.SUCCESS,
+                                null
+                            )
+                            println("Edit saved successfully")
+                            onSuccess()
+                        }
+                        .addOnFailureListener { e ->
+                            setError(ErrorCause.GENERAL_SAVE_FAIL, e)
+                        }
                 }
-                .addOnFailureListener { e ->
-                    setError(ErrorCause.GENERAL_SAVE_FAIL, e)
-                }
+            },
+            onFailure = { e ->
+                setError(ErrorCause.GENERAL_SAVE_FAIL, e)
             }
-        }
+        )
+    }
 
         fun deleteLocation(onSuccess: () -> Unit) {
             db.collection("locations")
@@ -220,6 +300,7 @@ class AddLocationViewModel : ViewModel() {
             description = ""
             tags = listOf()
             gpsCoordinates = null
+            images = listOf()
         }
 
         fun loadLocationForEdit(locationId: String) {
@@ -235,7 +316,8 @@ class AddLocationViewModel : ViewModel() {
                     description = location.description
                     tags = location.tags
                     gpsCoordinates = Pair(location.latitude, location.longitude)
-                    // also images
+                    images = location.imageUrls
+                    images = location.imageUrls
                 }
                 .addOnFailureListener { error ->
                     setError(ErrorCause.GENERAL_FETCH_FAIL, error)
