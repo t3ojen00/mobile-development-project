@@ -75,6 +75,7 @@ class LocationDetailViewModel : ViewModel() {
                         ?: document.getDouble("lng")
                         ?: 0.0,
                     previewImageUrl = document.getString("previewImageUrl") ?: "",
+                    imageUrls = (document.get("imageUrls") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
                     status = document.getString("status") ?: "pending",
                     createdAt = document.getString("createdAt")?: "",
                     updatedAt = document.getString("updatedAt")?: "",

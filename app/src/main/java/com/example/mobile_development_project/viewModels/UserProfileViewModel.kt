@@ -113,6 +113,7 @@ class ProfileViewModel : ViewModel() {
                         latitude = doc.getDouble("latitude") ?: 0.0,
                         longitude = doc.getDouble("longitude") ?: 0.0,
                         previewImageUrl = doc.getString("previewImageUrl") ?: "",
+                        imageUrls = (doc.get("imageUrls") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
                         status = doc.getString("status") ?: "pending",
                         createdAt = doc.getString("createdAt"),
                         updatedAt = doc.getString("updatedAt"),
