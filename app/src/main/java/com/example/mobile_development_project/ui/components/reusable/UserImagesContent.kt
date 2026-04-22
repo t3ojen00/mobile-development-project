@@ -28,16 +28,36 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+
+data class UserImageItem(
+    val locationId: String,
+    val locationName: String,
+    val locationDescription: String,
+    val imageUrl: String
+)
 @Composable
 fun UserImagesContent(
     locations: List<Location>,
     modifier: Modifier = Modifier
 ) {
-    val imageLocations = locations.filter {
-        it.previewImageUrl.isNotBlank()
+    val imageItems = locations.flatMap { location ->
+        val urls = when {
+            location.imageUrls.isNotEmpty() -> location.imageUrls
+            location.previewImageUrl.isNotBlank() -> listOf(location.previewImageUrl)
+            else -> emptyList()
+        }
+
+        urls.map { url ->
+            UserImageItem(
+                locationId = location.id,
+                locationName = location.name,
+                locationDescription = location.description,
+                imageUrl = url
+            )
+        }
     }
 
-    if (imageLocations.isEmpty()) {
+    if (imageItems.isEmpty()) {
         Box(
             modifier = modifier
                 .fillMaxWidth()
@@ -57,7 +77,10 @@ fun UserImagesContent(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(vertical = 12.dp)
     ) {
-        items(imageLocations) { location ->
+        items(
+            items = imageItems,
+            key = { item -> "${item.locationId}_${item.imageUrl}" }
+        ) { item ->
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -70,8 +93,8 @@ fun UserImagesContent(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     AsyncImage(
-                        model = location.previewImageUrl,
-                        contentDescription = location.name,
+                        model = item.imageUrl,
+                        contentDescription = item.locationName,
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(1f),
@@ -82,7 +105,7 @@ fun UserImagesContent(
                         modifier = Modifier.padding(12.dp)
                     ) {
                         Text(
-                            text = location.name.ifBlank { "Unnamed location" },
+                            text = item.locationName.ifBlank { "Unnamed location" },
                             color = Color.White,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
@@ -91,7 +114,7 @@ fun UserImagesContent(
                         Spacer(modifier = Modifier.height(6.dp))
 
                         Text(
-                            text = location.description.ifBlank { "No description available." },
+                            text = item.locationDescription.ifBlank { "No description available." },
                             color = Color.White,
                             style = MaterialTheme.typography.bodyMedium,
                             maxLines = 2
