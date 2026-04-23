@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -33,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,12 +43,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.mobile_development_project.data.models.User
 import com.example.mobile_development_project.navigation.NavRoutes
+import com.example.mobile_development_project.ui.components.reusable.ScrollToTopButton
 import com.example.mobile_development_project.ui.theme.AuthCardGray
 import com.example.mobile_development_project.ui.theme.Burgundy
 import com.example.mobile_development_project.ui.theme.OrangeAccent
 import com.example.mobile_development_project.ui.theme.ScreenBackground
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
 @Composable
 fun SearchLocationScreen(
@@ -60,6 +64,9 @@ fun SearchLocationScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val allUsers = remember { mutableStateListOf<User>() }
+
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         db.collection("users")
@@ -184,20 +191,38 @@ fun SearchLocationScreen(
             }
 
             else -> {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(ScreenBackground)
                 ) {
-                    items(filteredUsers) { user ->
-                        UserSearchItem(
-                            user = user,
-                            onClick = {
-                                navController.navigate(
-                                    NavRoutes.UserProfileWithId.replace("{id}", user.id)
-                                )
-                            }
-                        )
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(filteredUsers) { user ->
+                            UserSearchItem(
+                                user = user,
+                                onClick = {
+                                    navController.navigate(
+                                        NavRoutes.UserProfileWithId.replace("{id}", user.id)
+                                    )
+                                }
+                            )
+                        }
                     }
+                    ScrollToTopButton(
+                        listState = listState,
+                        onClick = {
+                            scope.launch {
+                                listState.animateScrollToItem(0)
+                            }
+                        },
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(12.dp)
+                    )
                 }
             }
         }
