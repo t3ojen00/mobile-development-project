@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -26,8 +28,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +42,7 @@ import androidx.navigation.NavHostController
 import com.example.mobile_development_project.navigation.NavRoutes
 import com.example.mobile_development_project.ui.components.reusable.FollowingContent
 import com.example.mobile_development_project.ui.components.reusable.PrimaryButton
+import com.example.mobile_development_project.ui.components.reusable.ScrollToTopButton
 import com.example.mobile_development_project.ui.components.reusable.UserImagesContent
 import com.example.mobile_development_project.ui.components.reusable.UserLocationContent
 import com.example.mobile_development_project.ui.theme.OrangeAccent
@@ -46,6 +50,7 @@ import com.example.mobile_development_project.ui.theme.ScreenBackground
 import com.example.mobile_development_project.viewModels.AuthViewModel
 import com.example.mobile_development_project.viewModels.ProfileViewModel
 import com.example.mobile_development_project.ui.theme.Attention
+import kotlinx.coroutines.launch
 
 @Composable
 fun UserProfileScreen(
@@ -65,7 +70,9 @@ fun UserProfileScreen(
     val followedUsers = viewModel.followedUsers
     val isFollowingUser = viewModel.isFollowingUser
     val isFollowLoading = viewModel.isFollowLoading
-    var selectedTab by remember { mutableStateOf(0) }
+    var selectedTab by remember { mutableIntStateOf(0) }
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
     if (viewModel.isLoading) {
         Box(
@@ -87,182 +94,205 @@ fun UserProfileScreen(
         else -> "User"
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(ScreenBackground)
-            .padding(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Top
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .background(ScreenBackground)
+                .padding(horizontal =16.dp, vertical = 6.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Profile icon",
-                tint = Color.DarkGray,
-                modifier = Modifier.size(56.dp)
-            )
 
-            Spacer(modifier = Modifier.weight(1f))
+            // header an profile infou
+            item {
+                Column {
 
-            if (isOwnProfile) {
-                PrimaryButton(
-                    label = "Log out",
-                    onClick = {
-                        authViewModel.logoutUser()
-                    },
-                    modifier = Modifier.height(40.dp).width(110.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Attention,
-                        contentColor = Color.White )
-                )
-            }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Profile icon",
+                            tint = Color.DarkGray,
+                            modifier = Modifier.size(56.dp)
+                        )
 
-        }
+                        Spacer(modifier = Modifier.weight(1f))
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = if (isOwnProfile) "Hello, $displayName" else displayName,
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-
-        if (user?.username?.isNotBlank() == true) {
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "@${user.username}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.DarkGray
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        if (isOwnProfile) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .clickable { navController.navigate(NavRoutes.Settings) }
-                    .background(
-                        color = OrangeAccent,
-                        shape = RoundedCornerShape(20.dp)
-                    )
-                    .padding(horizontal = 10.dp, vertical = 6.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Settings",
-                    tint = Color.White,
-                    modifier = Modifier.size(16.dp)
-                )
-
-                Spacer(modifier = Modifier.size(4.dp))
-
-                Text(
-                    text = "Settings",
-                    color = Color.White,
-                    style = MaterialTheme.typography.labelMedium
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (user?.role == "admin" || user?.role == "moderator") {
-                PrimaryButton(
-                    label = when (user.role) {
-                        "admin" -> "Admin actions"
-                        "moderator" -> "Moderator actions"
-                        else -> ""
-                    },
-                    onClick = {
-                        navController.navigate("admin/${user.role}")
+                        if (isOwnProfile) {
+                            PrimaryButton(
+                                label = "Log out",
+                                onClick = { authViewModel.logoutUser() },
+                                modifier = Modifier
+                                    .height(40.dp)
+                                    .width(110.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Attention,
+                                    contentColor = Color.White
+                                )
+                            )
+                        }
                     }
-                )
 
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = if (isOwnProfile) "Hello, $displayName" else displayName,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+
+                    if (user?.username?.isNotBlank() == true) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "@${user.username}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.DarkGray
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    if (isOwnProfile) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .clickable { navController.navigate(NavRoutes.Settings) }
+                                .background(
+                                    color = OrangeAccent,
+                                    shape = RoundedCornerShape(20.dp)
+                                )
+                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Menu,
+                                contentDescription = "Settings",
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
+                            )
+
+                            Spacer(modifier = Modifier.size(4.dp))
+
+                            Text(
+                                text = "Settings",
+                                color = Color.White,
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        if (user?.role == "admin" || user?.role == "moderator") {
+                            PrimaryButton(
+                                label = when (user.role) {
+                                    "admin" -> "Admin actions"
+                                    "moderator" -> "Moderator actions"
+                                    else -> ""
+                                },
+                                onClick = {
+                                    navController.navigate("admin/${user.role}")
+                                }
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                    } else if (!userId.isNullOrBlank() && userId != "current-user") {
+                        PrimaryButton(
+                            label = if (isFollowingUser) "Unfollow user" else "Follow user",
+                            onClick = { viewModel.toggleFollowUser(userId) },
+                            enabled = !isFollowLoading,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = OrangeAccent,
+                                contentColor = Color.White
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                }
+            }
+
+            // tab row
+            item {
+                HorizontalDivider(color = Color.Gray)
+
+                PrimaryTabRow(
+                    selectedTabIndex = selectedTab,
+                    containerColor = ScreenBackground,
+                    contentColor = OrangeAccent
+                ) {
+                    Tab(
+                        selected = selectedTab == 0,
+                        onClick = { selectedTab = 0 },
+                        text = {
+                            Text(if (isOwnProfile) "My locations" else "Locations")
+                        }
+                    )
+
+                    Tab(
+                        selected = selectedTab == 1,
+                        onClick = { selectedTab = 1 },
+                        text = {
+                            Text(if (isOwnProfile) "My images" else "Images")
+                        }
+                    )
+
+                    if (isOwnProfile) {
+                        Tab(
+                            selected = selectedTab == 2,
+                            onClick = { selectedTab = 2 },
+                            text = { Text("Following") }
+                        )
+                    }
+                }
+
+                HorizontalDivider(color = Color.Gray)
+            }
+
+            // tab content (scrolls with whole screen)
+            item {
                 Spacer(modifier = Modifier.height(16.dp))
-            }
-        } else if (!userId.isNullOrBlank() && userId != "current-user") {
-            PrimaryButton(
-                label = if (isFollowingUser) "Unfollow user" else "Follow user",
-                onClick = {
-                    viewModel.toggleFollowUser(userId)
-                },
-                enabled = !isFollowLoading,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = OrangeAccent,
-                    contentColor = Color.White
-                )
-            )
 
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        HorizontalDivider(color = Color.Gray)
-
-        PrimaryTabRow(
-            selectedTabIndex = selectedTab,
-            containerColor = ScreenBackground,
-            contentColor = OrangeAccent
-        ) {
-            Tab(
-                selected = selectedTab == 0,
-                onClick = { selectedTab = 0 },
-                text = {
-                    Text(if (isOwnProfile) "My locations" else "Locations")
-                },
-                selectedContentColor = OrangeAccent,
-                unselectedContentColor = Color.DarkGray
-            )
-
-            Tab(
-                selected = selectedTab == 1,
-                onClick = { selectedTab = 1 },
-                text = {
-                    Text(if (isOwnProfile) "My images" else "Images")
-                },
-                selectedContentColor = OrangeAccent,
-                unselectedContentColor = Color.DarkGray
-            )
-
-            if (isOwnProfile) {
-                Tab(
-                    selected = selectedTab == 2,
-                    onClick = { selectedTab = 2 },
-                    text = { Text("Following") },
-                    selectedContentColor = OrangeAccent,
-                    unselectedContentColor = Color.DarkGray
-                )
-            }
-        }
-
-        HorizontalDivider(color = Color.Gray)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        when (selectedTab) {
-            0 -> UserLocationContent(
-                locations = userLocations,
-                navController = navController,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            1 -> UserImagesContent(
-                locations = userLocations,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            2 -> {
-                if (isOwnProfile) {
-                    FollowingContent(
-                        followedUsers = followedUsers,
+                when (selectedTab) {
+                    0 -> UserLocationContent(
+                        locations = userLocations,
                         navController = navController,
                         modifier = Modifier.fillMaxWidth()
                     )
+
+                    1 -> UserImagesContent(
+                        locations = userLocations,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    2 -> {
+                        if (isOwnProfile) {
+                            FollowingContent(
+                                followedUsers = followedUsers,
+                                navController = navController,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
                 }
             }
         }
+       ScrollToTopButton(
+            listState = listState,
+            onClick = {
+                scope.launch {
+                    listState.animateScrollToItem(0)
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(12.dp)
+        )
     }
 }
+
+
+

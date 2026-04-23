@@ -29,9 +29,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.platform.LocalContext
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
-import com.google.android.gms.tasks.CancellationTokenSource
 import android.Manifest
 import android.annotation.SuppressLint
 import android.util.Log
@@ -56,7 +53,11 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import com.example.mobile_development_project.ui.helpers.createImageUri
+import com.example.mobile_development_project.helpers.createImageUri
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
+
 enum class FormMode {
     ADD,
     EDIT
@@ -148,35 +149,34 @@ fun CardFormComponent(
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { granted ->
+        contract = ActivityResultContracts.RequestPermission())
+    { granted ->
         if (!granted) {
             viewModel.setError(ErrorCause.LOCATION_PERMISSION_DENIED)
             return@rememberLauncherForActivityResult
         }
-            isLoading = true
+        isLoading = true
 
-            val cancellationToken = CancellationTokenSource().token
-            val client = LocationServices.getFusedLocationProviderClient(context)
+        val cancellationToken = CancellationTokenSource().token
+        val client = LocationServices.getFusedLocationProviderClient(context)
 
-                client.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationToken)
-                    .addOnSuccessListener { location ->
-                        isLoading = false
-                        if (location != null) {
-                            Log.d("GPS", "SOURCE LAT=${location.latitude}, LNG=${location.longitude}")
-                            viewModel.setGpsCoordinates(location.latitude, location.longitude)
-                        } else {
-                            // call works technically but location is null
-                            viewModel.setError(ErrorCause.LOCATION_UNAVAILABLE)
-                        }
-                    }
-                    // whole call fails
-                    .addOnFailureListener {
-                        viewModel.setError(ErrorCause.LOCATION_FETCH_FAILED, exception = it)
-                        isLoading = false
-                    }
+        client.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationToken)
+            .addOnSuccessListener { location ->
+                isLoading = false
+                if (location != null) {
+                    Log.d("GPS", "SOURCE LAT=${location.latitude}, LNG=${location.longitude}")
+                    viewModel.setGpsCoordinates(location.latitude, location.longitude)
+                } else {
+                    // call works technically but location is null
+                    viewModel.setError(ErrorCause.LOCATION_UNAVAILABLE)
+                }
+            }
+            // whole call fails
+            .addOnFailureListener {
+                viewModel.setError(ErrorCause.LOCATION_FETCH_FAILED, exception = it)
+                isLoading = false
+            }
       }
-
 
     Card(
         modifier = Modifier

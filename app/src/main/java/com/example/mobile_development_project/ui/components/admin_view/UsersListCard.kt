@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,7 +50,8 @@ fun UsersList(
     modifier: Modifier = Modifier,
     viewModel: AdminViewModel,
     onDelete: (User) -> Unit,
-    onPromote: (User, String) -> Unit
+    onPromote: (User, String) -> Unit,
+    listState: LazyListState
 ) {
 
     Text(
@@ -61,7 +63,10 @@ fun UsersList(
         textAlign = TextAlign.Center
     )
 
-    LazyColumn(modifier = modifier.fillMaxSize()) {
+    LazyColumn(
+        state = listState,
+        modifier = modifier.fillMaxSize())
+    {
         items(users) { user ->
 
             val isCurrentUser = viewModel.isCurrentUser(user.id)

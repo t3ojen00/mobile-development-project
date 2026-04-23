@@ -32,6 +32,7 @@ val FieldBackground = Color(0xFFFFFFFF)
 val Attention = Color(0xFFA10521)
 val rejectButton = Color(0xFF3A0811)
 
-val adminCards =  Color(0xFFEEE7E7)
+val adminCards =  Color(0xFFE7E7E7)
 
+val scrollButton = Color(0xFFFFFFFF).copy(alpha = 0.9f)
 

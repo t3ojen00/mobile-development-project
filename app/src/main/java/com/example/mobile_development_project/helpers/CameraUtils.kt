@@ -1,4 +1,4 @@
-package com.example.mobile_development_project.ui.helpers
+package com.example.mobile_development_project.helpers
 
 import android.content.Context
 import android.net.Uri
