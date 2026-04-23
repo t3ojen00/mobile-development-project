@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,7 +47,8 @@ import java.util.Locale
 @Composable
 fun RejectedLocations(
     viewModel: AdminViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    listState: LazyListState
 ) {
 
     val locations = viewModel.rejectedLocations
@@ -65,6 +67,7 @@ fun RejectedLocations(
     Spacer(modifier = Modifier.height(6.dp))
 
     LazyColumn(
+        state = listState,
         modifier = Modifier.fillMaxSize()
     ) {
         items(locations) { location ->
