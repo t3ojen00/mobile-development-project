@@ -48,6 +48,7 @@ import com.example.mobile_development_project.data.models.ErrorCause
 import com.example.mobile_development_project.navigation.NavRoutes
 import android.net.Uri
 import android.content.Context
+import androidx.compose.material3.HorizontalDivider
 import androidx.core.content.FileProvider
 import java.io.File
 import java.text.SimpleDateFormat
@@ -58,10 +59,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 
-enum class FormMode {
-    ADD,
-    EDIT
-}
+enum class FormMode { ADD, EDIT }
 
 // "create" a picture by taking it with camera
 fun createImageUri(context: Context): Uri {
@@ -98,7 +96,17 @@ fun CardFormComponent(
     val images = remember { mutableStateListOf<String?>(null, null, null) }
     var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
     var imageMenuExpanded by remember { mutableStateOf(false) }
+    var selectedImageIndex by remember { mutableStateOf<Int?>(null) }
 
+    fun setImageAt(index: Int, uri: String) {
+        val old = images[index]
+
+        if (old != null) {
+            viewModel.removeImage(old)
+        }
+        images[index] = uri
+        viewModel.addImage(uri)
+    }
     LaunchedEffect(viewModel.images) {
         for (i in 0..2) {
             images[i] = viewModel.images.getOrNull(i)
@@ -109,10 +117,14 @@ fun CardFormComponent(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
         if (uri != null) {
-            val emptyIndex = images.indexOfFirst { it == null }
-            if (emptyIndex != -1) {
-                images[emptyIndex] = uri.toString()
-                viewModel.addImage(uri.toString())
+            if (selectedImageIndex != null) {
+                // EDIT mode or ADD mode remove option
+                setImageAt(selectedImageIndex!!, uri.toString())
+            } else {
+                val emptyIndex = images.indexOfFirst { it == null }
+                if (emptyIndex != -1) {
+                    setImageAt(emptyIndex, uri.toString())
+                }
             }
         }
     }
@@ -121,10 +133,13 @@ fun CardFormComponent(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success && cameraImageUri != null) {
-            val emptyIndex = images.indexOfFirst { it == null }
-            if (emptyIndex != -1) {
-                images[emptyIndex] = cameraImageUri.toString()
-                viewModel.addImage(cameraImageUri.toString())
+            if (selectedImageIndex != null) {
+                setImageAt(selectedImageIndex!!, cameraImageUri.toString())
+            } else {
+                val emptyIndex = images.indexOfFirst { it == null }
+                if (emptyIndex != -1) {
+                    setImageAt(emptyIndex, cameraImageUri.toString())
+                }
             }
         }
     }
@@ -203,7 +218,16 @@ fun CardFormComponent(
                         }
                         images[index] = null
                     },
-                    onAddImage = null
+                    onAddFromGallery = { index ->
+                        selectedImageIndex = index
+                        photoPickerLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    },
+                    onAddFromCamera = { index ->
+                        selectedImageIndex = index
+                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                    }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -317,7 +341,8 @@ fun CardFormComponent(
                         DropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false },
-                            Modifier.padding(4.dp)
+                            Modifier.padding(6.dp),
+
                         ) {
                             DropdownMenuItem(
                                 text = { Text("Select from map") },
@@ -326,6 +351,8 @@ fun CardFormComponent(
                                     navController.navigate(NavRoutes.SelectFromMap)
                                 }
                             )
+
+                            HorizontalDivider(modifier = Modifier.padding(horizontal = 6.dp))
 
                             DropdownMenuItem(
                                 text = { Text("Allow access to GPS") },
@@ -349,7 +376,8 @@ fun CardFormComponent(
 
                         DropdownMenu(
                             expanded = imageMenuExpanded,
-                            onDismissRequest = { imageMenuExpanded = false }
+                            onDismissRequest = { imageMenuExpanded = false },
+                            Modifier.padding(6.dp)
                         ) {
                             DropdownMenuItem(
                                 text = { Text("Choose from gallery") },
@@ -362,6 +390,7 @@ fun CardFormComponent(
                                     }
                                 }
                             )
+                            HorizontalDivider(modifier = Modifier.padding(horizontal = 6.dp))
 
                             DropdownMenuItem(
                                 text = { Text("Take a picture") },
@@ -388,14 +417,14 @@ fun CardFormComponent(
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
 
             if (mode == FormMode.ADD) {
                 Spacer(modifier = Modifier.height(20.dp))
                 ImageCarousel(
                     items = images,
-                    editMode = true,
+                    editMode = false,
                     onRemoveImage = { index ->
                         val uriToRemove = images[index]
                         if (uriToRemove != null) {
@@ -403,7 +432,8 @@ fun CardFormComponent(
                         }
                         images[index] = null
                     },
-                    onAddImage = null
+                    onAddFromGallery = null,
+                    onAddFromCamera = null
                 )
             }
 
