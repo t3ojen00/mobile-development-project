@@ -15,6 +15,7 @@ object ErrorMapper {
             ErrorCause.GENERAL_FETCH_FAIL -> "Error fetching data"
             ErrorCause.GENERAL_UPDATE_FAIL -> "Error updating data"
             ErrorCause.GENERAL_SAVE_FAIL -> "Error saving data, please try again"
+            ErrorCause.DELETE_FAIL -> "Error deleting data, please try again"
             else -> "Unexpected error"
         }
     }
