@@ -37,6 +37,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.mobile_development_project.R
+import com.example.mobile_development_project.data.models.Location
 import com.example.mobile_development_project.navigation.NavRoutes
 import com.example.mobile_development_project.ui.components.reusable.PrimaryButton
 import com.example.mobile_development_project.ui.theme.adminCards
@@ -48,7 +49,8 @@ import java.util.Locale
 fun RejectedLocations(
     viewModel: AdminViewModel,
     navController: NavHostController,
-    listState: LazyListState
+    listState: LazyListState,
+    onDelete: (Location) -> Unit
 ) {
 
     val locations = viewModel.rejectedLocations
@@ -237,9 +239,7 @@ fun RejectedLocations(
                         Spacer(modifier = Modifier.weight(0.8f))
 
                         IconButton(
-                            onClick = {
-                                viewModel.deleteLocation(location.id)
-                            },
+                            onClick = { onDelete(location) },
                             modifier = Modifier
                                 .size(44.dp)
                                 .clip(CircleShape)
