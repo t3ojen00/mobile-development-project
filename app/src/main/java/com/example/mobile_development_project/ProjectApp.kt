@@ -48,7 +48,7 @@ fun ProjectApp() {
 
     val role = backStackEntry?.arguments?.getString("role") ?: ""
 
-    val showTopBar = currentRoute !in authRoutes
+    val showTopBar = true
     val showBottomBar = currentRoute !in authRoutes
 
     LaunchedEffect(isLoggedIn, currentRoute) {
