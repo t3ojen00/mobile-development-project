@@ -30,8 +30,8 @@ val bottomItems = listOf(
     ),
     BottomNavItem(
         route = NavRoutes.Search,
-        label = "Search",
-        icon = R.drawable.search_icon
+        label = "Users",
+        icon = R.drawable.users_icon
     ),
     BottomNavItem(
         route = NavRoutes.UserProfile,
