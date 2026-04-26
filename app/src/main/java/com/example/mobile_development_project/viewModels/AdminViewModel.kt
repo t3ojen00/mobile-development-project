@@ -184,6 +184,9 @@ class AdminViewModel : ViewModel() {
                 )
                 fetchRejectedLocations()
             }
+            .addOnFailureListener { exception ->
+                setError(ErrorCause.DELETE_FAIL, exception)
+            }
     }
     fun deleteUser(userId: String) {
         db.collection("users")
@@ -197,5 +200,11 @@ class AdminViewModel : ViewModel() {
                 )
                 fetchAllUsers()
             }
+            .addOnFailureListener { exception ->
+                setError(ErrorCause.DELETE_FAIL, exception)
+            }
+    }
+    fun clearMessage() {
+        uiMessage = null
     }
 }

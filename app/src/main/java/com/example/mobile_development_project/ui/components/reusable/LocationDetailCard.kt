@@ -62,7 +62,10 @@ fun LocationDetailCard(
     ) {
         ImageCarousel(
             items = carouselItems,
-            editMode = false
+            editMode = false,
+            onRemoveImage = null,
+            onAddFromGallery = null,
+            onAddFromCamera = null
         )
 
         Spacer(modifier = Modifier.height(12.dp))

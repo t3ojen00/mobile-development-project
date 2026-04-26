@@ -92,33 +92,7 @@ fun RegisterScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(ScreenBackground)
-            .statusBarsPadding()
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Burgundy)
-                .padding(horizontal = 8.dp, vertical = 12.dp)
-        ) {
-            IconButton(
-                onClick = onBackClick,
-                modifier = Modifier.align(Alignment.CenterStart)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Color.White
-                )
-            }
-
-            Text(
-                text = "Register",
-                color = Color.White,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()

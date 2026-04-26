@@ -33,9 +33,6 @@ fun Navigation(
     ) {
         composable(NavRoutes.Login) {
             LoginScreen(
-                onBackClick = {
-                    navController.popBackStack()
-                },
                 onNavigateToRegister = {
                     navController.navigate(NavRoutes.Register)
                 },

@@ -16,6 +16,7 @@ enum class ErrorCause {
     GENERAL_FETCH_FAIL,
     GENERAL_UPDATE_FAIL,
     GENERAL_SAVE_FAIL,
-    TAG_EXISTS
+    TAG_EXISTS,
+    DELETE_FAIL
 
 }
