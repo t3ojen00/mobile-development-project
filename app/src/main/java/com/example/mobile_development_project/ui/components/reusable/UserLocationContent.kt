@@ -89,7 +89,7 @@ fun StatusBadge(
     val (text, color) = when (status.lowercase()) {
         "pending" -> "Pending" to Color(0xFFE29750)   // orange
         "approved" -> "Approved" to Color(0xFF709176) // green
-        "rejected" -> "Rejected" to Color(0xFF709176) // red
+        "rejected" -> "Rejected" to Color(0xFFB83A4B) // red
         else -> status to Color.Gray
     }
 
