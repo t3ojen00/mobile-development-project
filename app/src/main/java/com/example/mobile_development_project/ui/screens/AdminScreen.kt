@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -192,7 +193,7 @@ fun AdminScreen(
                     ) {
                         Text(
                             "Delete",
-                            color = Attention)
+                            color = MaterialTheme.colorScheme.error)
                     }
                 },
                 dismissButton = {
@@ -206,14 +207,14 @@ fun AdminScreen(
                 },
                 title = {
                     Text("Delete user",
-                    color = Attention)
+                    color = MaterialTheme.colorScheme.error)
                         },
                 text = {
                     Text(
                         buildAnnotatedString {
                             append("Are you sure you want to delete ")
                             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append(user.username)
+                                append(user.username.takeIf { it.isNotBlank() } ?: user.email)
                             }
                             append("?")
                         }

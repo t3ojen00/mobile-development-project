@@ -36,6 +36,7 @@ import com.example.mobile_development_project.ui.components.reusable.FormMode
 import com.example.mobile_development_project.ui.components.reusable.PrimaryButton
 import com.example.mobile_development_project.ui.theme.Attention
 import com.example.mobile_development_project.ui.theme.OrangeAccent
+import com.example.mobile_development_project.ui.theme.rejectButton
 import com.example.mobile_development_project.viewModels.AddLocationViewModel
 
 sealed class DialogState {
@@ -90,7 +91,7 @@ fun EditLocationScreen(
                     modifier = Modifier
                         .size(44.dp)
                         .clip(CircleShape)
-                        .background(color = Attention)
+                        .background(color = rejectButton)
                         .padding(2.dp)
                 ) {
                     Icon(
@@ -117,7 +118,7 @@ fun EditLocationScreen(
                             }
                         }
                     ) {
-                        Text("Delete", color = Attention, fontWeight = FontWeight.Bold)
+                        Text("Delete", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
                     }
                 },
                 dismissButton = {
