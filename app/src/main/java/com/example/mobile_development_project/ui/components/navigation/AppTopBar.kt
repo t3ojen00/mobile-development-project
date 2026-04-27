@@ -34,7 +34,7 @@ fun TopBar(
     // location marker icon only on map screen
     val showMarkerIcon = currentRoute == NavRoutes.Map
     val isAuthScreen = currentRoute in listOf(NavRoutes.Login, NavRoutes.Register)
-    val containerColor = if (isAuthScreen) Burgundy else MaterialTheme.colorScheme.surface
+    val containerColor = if (isAuthScreen) Burgundy else Color(0xFFD4D4D8)
     val contentColor = if (isAuthScreen) Color.White else MaterialTheme.colorScheme.onSurface
 
     // define title based on route
@@ -58,7 +58,7 @@ fun TopBar(
     CenterAlignedTopAppBar(
         modifier = Modifier.fillMaxWidth(),
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = Color(0xFFD4D4D8),
+            containerColor = containerColor,
             titleContentColor = contentColor,
             navigationIconContentColor = contentColor
         ),
