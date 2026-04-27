@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.mobile_development_project.data.models.Location
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 
 class FavoritesViewModel : ViewModel() {
@@ -30,28 +31,42 @@ class FavoritesViewModel : ViewModel() {
             .get()
             .addOnSuccessListener { result ->
 
-                favoriteLocations = result.documents.map { doc ->
-                    Location(
-                        id = doc.getString("locationId") ?: doc.id,
-                        ownerId = doc.getString("ownerId") ?: "",
-                        ownerUsername = doc.getString("ownerUsername") ?: "",
-                        name = doc.getString("name") ?: "",
-                        description = "",
-                        tags = emptyList(),
-                        latitude = 0.0,
-                        longitude = 0.0,
-                        previewImageUrl = doc.getString("previewImageUrl") ?: "",
-                        status = "approved",
-                        createdAt = null,
-                        updatedAt = null,
-                        favoritesCount = 0
-                    )
+                val locationIds = result.documents.mapNotNull {
+                    it.getString("locationId")
+                }
+                if (locationIds.isEmpty()) {
+                    isLoading = false
+                    return@addOnSuccessListener
                 }
 
-                isLoading = false
-            }
-            .addOnFailureListener {
-                isLoading = false
+                db.collection("locations")
+                    .whereIn(FieldPath.documentId(), locationIds)
+                    .get()
+                    .addOnSuccessListener { locationsResult ->
+
+                        favoriteLocations = locationsResult.documents.map { doc ->
+                            Location(
+                                id = doc.getString("locationId") ?: doc.id,
+                                ownerId = doc.getString("ownerId") ?: "",
+                                ownerUsername = doc.getString("ownerUsername") ?: "",
+                                name = doc.getString("name") ?: "",
+                                description = "",
+                                tags = emptyList(),
+                                latitude = 0.0,
+                                longitude = 0.0,
+                                previewImageUrl = doc.getString("previewImageUrl") ?: "",
+                                status = "approved",
+                                createdAt = null,
+                                updatedAt = null,
+                                favoritesCount = 0
+                            )
+                        }
+
+                        isLoading = false
+                    }
+                    .addOnFailureListener {
+                        isLoading = false
+                    }
             }
     }
 }
