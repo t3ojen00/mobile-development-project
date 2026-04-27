@@ -58,7 +58,7 @@ fun TopBar(
     CenterAlignedTopAppBar(
         modifier = Modifier.fillMaxWidth(),
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = containerColor,
+            containerColor = Color(0xFFD4D4D8),
             titleContentColor = contentColor,
             navigationIconContentColor = contentColor
         ),

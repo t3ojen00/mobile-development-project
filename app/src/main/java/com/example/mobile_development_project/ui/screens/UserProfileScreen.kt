@@ -129,7 +129,7 @@ fun UserProfileScreen(
                                     .height(40.dp)
                                     .width(110.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Attention,
+                                    containerColor = Color(0xFFB83A4B),
                                     contentColor = Color.White
                                 )
                             )
@@ -222,7 +222,7 @@ fun UserProfileScreen(
                 PrimaryTabRow(
                     selectedTabIndex = selectedTab,
                     containerColor = ScreenBackground,
-                    contentColor = OrangeAccent
+                    contentColor = Color(0xFF474747)
                 ) {
                     Tab(
                         selected = selectedTab == 0,

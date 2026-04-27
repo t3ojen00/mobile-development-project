@@ -155,7 +155,7 @@ fun LocationDetailCard(
                                 Icons.Outlined.FavoriteBorder
                             },
                             contentDescription = "Favorite",
-                            tint = Burgundy
+                            tint = Color(0xFFB83A4B)
                         )
                     }
                 }

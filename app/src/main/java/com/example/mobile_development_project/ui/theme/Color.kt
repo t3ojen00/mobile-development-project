@@ -12,27 +12,27 @@ val Pink40 = Color(0xFF7D5260)
 
 // own colors
 
-val navbar = Color(0xFF020202)
+val navbar = Color(0xFF709176)
 val navIcon = Color(0xFFF8F8F8)
-val cardColor = Color(0xFFC7C7C7)
-val errorMsg = Color(0xFFAF001D)
-val successMsg = Color(0xFF005D27)
+val cardColor = Color(0xFF474747)
+val errorMsg = Color(0xFFB83A4B)
+val successMsg = Color(0xFF627F67)
 
-val Burgundy = Color(0xFF721022)
+val Burgundy = Color(0xFF627F67)
 
-val OrangeAccent = Color(0xFFF27F1B)
+val OrangeAccent = Color(0xFFE29750)
 
 val Sage = Color(0xFFB6CCBC)
 
-val AuthCardGray = Color(0xFF6B6B6B)
+val AuthCardGray = Color(0xFF474747)
 
-val ScreenBackground = Color(0xFFF5F5F5)
+val ScreenBackground = Color(0xFFDFE0E2)
 
-val FieldBackground = Color(0xFFFFFFFF)
-val Attention = Color(0xFFA10521)
-val rejectButton = Color(0xFF3A0811)
+val FieldBackground = Color(0xFFDFE0E2)
+val Attention = Color(0xFF627F67)
+val rejectButton = Color(0xFFB83A4B)
 
-val adminCards =  Color(0xFFE7E7E7)
+val adminCards =  Color(0xFFEFF2F1)
 
 val scrollButton = Color(0xFFFFFFFF).copy(alpha = 0.9f)
 
