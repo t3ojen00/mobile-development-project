@@ -1,22 +1,9 @@
 package com.example.mobile_development_project.ui.components.reusable
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,7 +16,6 @@ import androidx.navigation.NavHostController
 import com.example.mobile_development_project.data.models.Location
 import com.example.mobile_development_project.navigation.NavRoutes
 import com.example.mobile_development_project.ui.theme.AuthCardGray
-import com.example.mobile_development_project.ui.theme.Burgundy
 
 @Composable
 fun UserLocationContent(
@@ -37,106 +23,89 @@ fun UserLocationContent(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    if (locations.isEmpty()) {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    Column(modifier = modifier) {
+
+        if (locations.isEmpty()) {
             Text(
                 text = "No locations yet",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.DarkGray
+                color = Color.DarkGray,
+                style = MaterialTheme.typography.bodyMedium
             )
+            return
         }
-        return
-    }
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
         locations.forEach { location ->
-            UserLocationCard(
-                location = location,
-                onClick = {
-                    navController.navigate(
-                        NavRoutes.LocationDetail.replace("{id}", location.id)
+
+            Box {
+                // MAIN CARD
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp)
+                        .background(
+                            color = AuthCardGray,
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        .clickable {
+                            navController.navigate(
+                                NavRoutes.LocationDetail.replace("{id}", location.id)
+                            )
+                        }
+                        .padding(16.dp)
+                ) {
+
+                    Text(
+                        text = location.name,
+                        color = Color.White,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = location.description,
+                        color = Color.LightGray,
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
-            )
+
+                // 🏷 STATUS LABEL
+                StatusBadge(
+                    status = location.status,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                )
+            }
         }
     }
 }
-
 @Composable
-private fun UserLocationCard(
-    location: Location,
-    onClick: () -> Unit
+fun StatusBadge(
+    status: String,
+    modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = AuthCardGray),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+    val (text, color) = when (status.lowercase()) {
+        "pending" -> "Pending" to Color(0xFFFFA500)   // orange
+        "approved" -> "Approved" to Color(0xFF4CAF50) // green
+        "rejected" -> "Rejected" to Color(0xFFF44336) // red
+        else -> status to Color.Gray
+    }
+
+    Box(
+        modifier = modifier
+            .background(
+                color = color,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(horizontal = 10.dp, vertical = 4.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = location.name.ifBlank { "Unnamed location" },
-                color = Color.White,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = location.description.ifBlank { "No description available." },
-                color = Color.White,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 2
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            if (location.tags.isNotEmpty()) {
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    location.tags.take(3).forEach { tag ->
-                        TagComponent(tag = tag)
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "Favorites",
-                    tint = Burgundy,
-                    modifier = Modifier.size(18.dp)
-                )
-
-                Spacer(modifier = Modifier.size(6.dp))
-
-                Text(
-                    text = "${location.favoritesCount}",
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        }
+        Text(
+            text = text,
+            color = Color.White,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
