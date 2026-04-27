@@ -111,7 +111,7 @@ fun UserCard(
                     when {
                         user.username.isNotBlank() -> user.username
                         user.email.isNotBlank() -> user.email
-                        else -> ""
+                        else -> "Unknown"
                     }
 
                 Text(
@@ -132,6 +132,16 @@ fun UserCard(
                             .padding(horizontal = 8.dp, vertical = 2.dp)
                     )
                 }
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+
+            val hasUsername = user.username.isNotBlank()
+            val hasEmail = user.email.isNotBlank()
+            if (hasUsername && hasEmail) {
+                Text(
+                    text = user.email,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
 
             if (user.createdAt?.isNotBlank() ?: false) {

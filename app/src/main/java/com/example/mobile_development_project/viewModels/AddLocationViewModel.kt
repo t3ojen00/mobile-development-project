@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import android.net.Uri
 import java.util.UUID
+import kotlin.collections.emptyList
 
 
 class AddLocationViewModel : ViewModel() {
@@ -113,30 +114,40 @@ class AddLocationViewModel : ViewModel() {
                 .child(userId)
                 .child(fileName)
 
-            imageRef.putFile(localUri)
-                .addOnSuccessListener {
-                    imageRef.downloadUrl
-                        .addOnSuccessListener { downloadUri ->
-                            if (hasFailed) return@addOnSuccessListener
+            if(localUri.scheme == "content" || localUri.scheme == "file") {
 
-                            uploadedUrls.add(downloadUri.toString())
-                            completedCount++
+                imageRef.putFile(localUri)
+                    .addOnSuccessListener {
+                        imageRef.downloadUrl
+                            .addOnSuccessListener { downloadUri ->
+                                if (hasFailed) return@addOnSuccessListener
 
-                            if (completedCount == images.size) {
-                                onSuccess(uploadedUrls)
+                                uploadedUrls.add(downloadUri.toString())
+                                completedCount++
+
+                                if (completedCount == images.size) {
+                                    onSuccess(uploadedUrls)
+                                }
                             }
-                        }
-                        .addOnFailureListener { e ->
-                            if (hasFailed) return@addOnFailureListener
-                            hasFailed = true
-                            onFailure(e)
-                        }
+                            .addOnFailureListener { e ->
+                                if (hasFailed) return@addOnFailureListener
+                                hasFailed = true
+                                onFailure(e)
+                            }
+                    }
+                    .addOnFailureListener { e ->
+                        if (hasFailed) return@addOnFailureListener
+                        hasFailed = true
+                        onFailure(e)
+                    }
+            } else {
+                uploadedUrls.add(imageString)
+                completedCount++
+
+                if (completedCount == images.size) {
+                    onSuccess(uploadedUrls)
                 }
-                .addOnFailureListener { e ->
-                    if (hasFailed) return@addOnFailureListener
-                    hasFailed = true
-                    onFailure(e)
-                }
+            }
         }
     }
 
@@ -242,8 +253,7 @@ class AddLocationViewModel : ViewModel() {
             }
         )
     }
-
-        fun deleteLocation(onSuccess: () -> Unit) {
+    fun deleteLocation(onSuccess: () -> Unit) {
             db.collection("locations")
                 .document(editingLocationId!!)
                 .delete()
