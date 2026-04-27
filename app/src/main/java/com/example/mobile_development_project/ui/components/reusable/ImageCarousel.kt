@@ -103,7 +103,7 @@ fun ImageCarousel(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete",
-                        tint = Attention,
+                        tint = Color(0xFFB83A4B),
                         modifier = Modifier.size(32.dp)
                     )
                 }

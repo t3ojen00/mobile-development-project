@@ -75,7 +75,7 @@ fun UserLocationContent(
                     status = location.status,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(8.dp)
+                        .padding(16.dp)
                 )
             }
         }
