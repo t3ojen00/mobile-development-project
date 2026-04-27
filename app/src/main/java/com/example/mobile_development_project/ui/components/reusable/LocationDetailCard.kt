@@ -133,6 +133,18 @@ fun LocationDetailCard(
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "Latitude: %.3f".format(location.latitude),
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = "Longitude: %.3f".format(location.longitude),
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyMedium
+                )
 
                 Spacer(modifier = Modifier.height(28.dp))
 
