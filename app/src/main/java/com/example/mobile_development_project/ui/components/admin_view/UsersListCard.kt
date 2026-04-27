@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -198,7 +199,8 @@ fun UserCard(
 
                         DropdownMenu(
                             expanded = menuExpanded,
-                            onDismissRequest = { menuExpanded = false }
+                            onDismissRequest = { menuExpanded = false },
+                            modifier = Modifier.width(130.dp)
                         ) {
 
                             DropdownMenuItem(
@@ -208,6 +210,7 @@ fun UserCard(
                                     onPromote("moderator")
                                 }
                             )
+                            HorizontalDivider(modifier = Modifier.padding(horizontal = 6.dp))
 
                             DropdownMenuItem(
                                 text = { Text("Admin") },
