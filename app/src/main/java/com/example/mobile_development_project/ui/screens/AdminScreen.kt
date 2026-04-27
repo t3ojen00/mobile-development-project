@@ -76,7 +76,7 @@ fun AdminScreen(
             {
                 PrimaryTabRow(
                     selectedTabIndex = selectedTab,
-                    containerColor = Color.White,
+                    containerColor = Color(0xFFC9CBCF),
                     contentColor = Burgundy
                 ) {
                     Tab(
