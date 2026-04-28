@@ -35,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.mobile_development_project.data.models.MsgType
 import com.example.mobile_development_project.data.models.User
+import com.example.mobile_development_project.ui.components.admin_view.AnalyticsScreen
 import com.example.mobile_development_project.ui.theme.Burgundy
 import com.example.mobile_development_project.viewModels.AdminViewModel
 import com.example.mobile_development_project.ui.components.admin_view.PendingLocations
@@ -43,6 +44,7 @@ import com.example.mobile_development_project.ui.components.admin_view.UsersList
 import com.example.mobile_development_project.ui.components.reusable.ScrollToTopButton
 import com.example.mobile_development_project.ui.theme.Attention
 import com.example.mobile_development_project.ui.theme.OrangeAccent
+import com.example.mobile_development_project.viewModels.AnalyticsViewModel
 import kotlinx.coroutines.launch
 
 sealed class Dialog {
@@ -67,6 +69,7 @@ fun AdminScreen(
     val pendingState = rememberLazyListState()
     val usersState = rememberLazyListState()
     val rejectedState = rememberLazyListState()
+    val analyticsState = rememberLazyListState()
     var dialogState by remember { mutableStateOf<Dialog>(Dialog.None) }
     val message = viewModel.uiMessage
 
@@ -100,6 +103,11 @@ fun AdminScreen(
                         text = { Text("Rejected") },
                         selectedContentColor = Burgundy,
                         unselectedContentColor = Color.DarkGray
+                    )
+                    Tab(
+                        selected = selectedTab == 3,
+                        onClick = { selectedTab = 3 },
+                        text = { Text("Analytics") },
                     )
                 }
 
@@ -136,18 +144,21 @@ fun AdminScreen(
                             dialogState = Dialog.DeleteLocation(location.id)
                         }
                     )
-                    /*
-                    3 -> Statistics()
-                  */
+
+                    3 -> AnalyticsScreen(
+                        viewModel = AnalyticsViewModel()
+                    )
                 }
             }
         } else if (role == "moderator") {
             PendingLocations(viewModel, navController, role, listState = pendingState)
         }
+
         val currentTabState = when (selectedTab) {
             0 -> pendingState
             1 -> usersState
             2 -> rejectedState
+            3 -> analyticsState
             else -> pendingState
         }
 
