@@ -51,6 +51,9 @@ import com.example.mobile_development_project.viewModels.AuthViewModel
 import com.example.mobile_development_project.viewModels.ProfileViewModel
 import com.example.mobile_development_project.ui.theme.Attention
 import kotlinx.coroutines.launch
+import com.example.mobile_development_project.ui.components.reusable.UserStatisticsContent
+
+
 
 @Composable
 fun UserProfileScreen(
@@ -70,6 +73,9 @@ fun UserProfileScreen(
     val followedUsers = viewModel.followedUsers
     val isFollowingUser = viewModel.isFollowingUser
     val isFollowLoading = viewModel.isFollowLoading
+    val followingCount = viewModel.followingCount
+    val followersCount = viewModel.followersCount
+    val totalFavoritesCount = viewModel.totalFavoritesCount
     var selectedTab by remember { mutableIntStateOf(0) }
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -246,6 +252,12 @@ fun UserProfileScreen(
                             onClick = { selectedTab = 2 },
                             text = { Text("Following") }
                         )
+
+                        Tab(
+                            selected = selectedTab == 3,
+                            onClick = { selectedTab = 3 },
+                            text = { Text("Stats") }
+                        )
                     }
                 }
 
@@ -273,6 +285,16 @@ fun UserProfileScreen(
                             FollowingContent(
                                 followedUsers = followedUsers,
                                 navController = navController,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                    3 -> {
+                        if (isOwnProfile) {
+                            UserStatisticsContent(
+                                followingCount = followingCount,
+                                followersCount = followersCount,
+                                totalFavoritesCount = totalFavoritesCount,
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }

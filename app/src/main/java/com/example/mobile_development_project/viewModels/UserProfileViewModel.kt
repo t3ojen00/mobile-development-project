@@ -34,7 +34,14 @@ class ProfileViewModel : ViewModel() {
 
     var isFollowLoading by mutableStateOf(false)
         private set
+    var followingCount by mutableStateOf(0)
+        private set
 
+    var followersCount by mutableStateOf(0)
+        private set
+
+    var totalFavoritesCount by mutableStateOf(0)
+        private set
     fun loadProfileData(targetUserId: String? = null) {
         val resolvedUserId = when {
             targetUserId.isNullOrBlank() || targetUserId == "current-user" -> auth.currentUser?.uid
@@ -57,9 +64,13 @@ class ProfileViewModel : ViewModel() {
 
         if (isCurrentUserProfile(targetUserId)) {
             loadFollowedUsers()
+            loadFollowersCount(resolvedUserId)
             isFollowingUser = false
         } else {
             followedUsers = emptyList()
+            followersCount = 0
+            followingCount = 0
+            totalFavoritesCount = 0
             checkIfFollowing(resolvedUserId)
         }
     }
@@ -120,6 +131,7 @@ class ProfileViewModel : ViewModel() {
                         favoritesCount = doc.getLong("favoritesCount")?.toInt() ?: 0
                     )
                 }
+                totalFavoritesCount = userLocations.sumOf { it.favoritesCount }
             }
             .addOnFailureListener { error ->
                 Log.e("UserProfileVM", "loadUserLocations failed", error)
@@ -147,7 +159,9 @@ class ProfileViewModel : ViewModel() {
                     } else {
                         it.username.lowercase()
                     }
+
                 }
+                followingCount = followedUsers.size
             }
             .addOnFailureListener { error ->
                 Log.e("UserProfileVM", "loadFollowedUsers failed", error)
@@ -237,5 +251,18 @@ class ProfileViewModel : ViewModel() {
         }
 
         return currentUserId != null && currentUserId == resolvedTargetId
+    }
+
+    private fun loadFollowersCount(uid: String) {
+        db.collection("follows")
+            .whereEqualTo("followingId", uid)
+            .get()
+            .addOnSuccessListener { result ->
+                followersCount = result.documents.size
+            }
+            .addOnFailureListener { error ->
+                Log.e("UserProfileVM", "loadFollowersCount failed", error)
+                followersCount = 0
+            }
     }
 }
