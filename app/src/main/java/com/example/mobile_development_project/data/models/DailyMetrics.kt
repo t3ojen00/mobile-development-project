@@ -1,4 +1,8 @@
 package com.example.mobile_development_project.data.models
 
-class DailyMetrics {
-}
+data class DailyMetrics(
+    val activeUsers: Int,
+    val avgSessionDuration: Double,
+    val totalSessions: Int,
+    val totalUsers: Int
+)
