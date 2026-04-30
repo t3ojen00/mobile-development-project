@@ -20,14 +20,17 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mobile_development_project.ui.components.reusable.SecondaryButton
 import com.example.mobile_development_project.viewModels.AnalyticsViewModel
+import com.example.mobile_development_project.viewModels.PhotoAnalyticsViewModel
 
 @Composable
-fun StatisticsScreen(viewModel: AnalyticsViewModel = viewModel()) {
+fun StatisticsScreen(viewModel: AnalyticsViewModel = viewModel(), photoViewModel: PhotoAnalyticsViewModel = viewModel()) {
 
     val metrics by viewModel.dailyMetrics.collectAsState()
+    val imageMetrics by photoViewModel.imageMetrics.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.loadData()
+        photoViewModel.loadData()
     }
 
     LazyColumn(
@@ -84,6 +87,20 @@ fun StatisticsScreen(viewModel: AnalyticsViewModel = viewModel()) {
                     .fillMaxWidth(),
                 textAlign = TextAlign.Center)
             MetricsChartAvgSession(metrics)
+        }
+
+        item { Spacer(modifier = Modifier.height(20.dp)) }
+
+        item {
+            Text(
+                "Average uploaded images per active user",
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+
+            ImagesPerUserChart(imageMetrics)
         }
     }
 }
