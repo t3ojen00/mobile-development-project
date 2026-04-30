@@ -29,6 +29,12 @@ class MainActivity : ComponentActivity() {
         super.onStart()
         analyticsViewModel.startSession()
     }
+    override fun onPause() {
+        super.onPause()
+
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        analyticsViewModel.endSession(uid)
+    }
 
     override fun onStop() {
         super.onStop()
