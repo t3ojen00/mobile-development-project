@@ -35,7 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.mobile_development_project.data.models.MsgType
 import com.example.mobile_development_project.data.models.User
-import com.example.mobile_development_project.ui.components.admin_view.AnalyticsScreen
+import com.example.mobile_development_project.ui.components.admin_view.StatisticsScreen
 import com.example.mobile_development_project.ui.theme.Burgundy
 import com.example.mobile_development_project.viewModels.AdminViewModel
 import com.example.mobile_development_project.ui.components.admin_view.PendingLocations
@@ -69,7 +69,7 @@ fun AdminScreen(
     val pendingState = rememberLazyListState()
     val usersState = rememberLazyListState()
     val rejectedState = rememberLazyListState()
-    val analyticsState = rememberLazyListState()
+    val statisticsState = rememberLazyListState()
     var dialogState by remember { mutableStateOf<Dialog>(Dialog.None) }
     val message = viewModel.uiMessage
 
@@ -107,7 +107,7 @@ fun AdminScreen(
                     Tab(
                         selected = selectedTab == 3,
                         onClick = { selectedTab = 3 },
-                        text = { Text("Analytics") },
+                        text = { Text("Statistics") },
                     )
                 }
 
@@ -145,7 +145,7 @@ fun AdminScreen(
                         }
                     )
 
-                    3 -> AnalyticsScreen(
+                    3 -> StatisticsScreen(
                         viewModel = AnalyticsViewModel()
                     )
                 }
@@ -158,7 +158,7 @@ fun AdminScreen(
             0 -> pendingState
             1 -> usersState
             2 -> rejectedState
-            3 -> analyticsState
+            3 -> statisticsState
             else -> pendingState
         }
 

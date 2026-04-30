@@ -22,7 +22,7 @@ import com.example.mobile_development_project.ui.components.reusable.SecondaryBu
 import com.example.mobile_development_project.viewModels.AnalyticsViewModel
 
 @Composable
-fun AnalyticsScreen(viewModel: AnalyticsViewModel = viewModel()) {
+fun StatisticsScreen(viewModel: AnalyticsViewModel = viewModel()) {
 
     val metrics by viewModel.dailyMetrics.collectAsState()
 
@@ -38,7 +38,7 @@ fun AnalyticsScreen(viewModel: AnalyticsViewModel = viewModel()) {
 
         item {
             Text(
-                "Weekly analytics",
+                "Weekly statistics",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
